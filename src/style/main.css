@@ -1,0 +1,9 @@
+
+@import 'variable.css';
+@import url('//at.alicdn.com/t/c/font_5019718_587j9cnjr7r.css');
+/* 全局样式 */
+body {
+  margin: 0;
+  background-color: var(--background-color);
+  transition: var(--transition-slow); /* 平滑切换主题 */
+}

@@ -1,0 +1,89 @@
+/* ==================== 根变量（默认主题 - 白天模式） ==================== */
+:root {
+  /* 主题色 */
+  --primary-color: #ea3e3e;           /* 网易云红 */
+  --secondary-color: #f0f3f6;         /* 次色调 */
+  --third-color: #f7f9fc;         /* 次色调 */
+  
+  /* 文字颜色 */
+  --text-color: #000000ff;                 /* 主要文字 */
+  --text-color-light: #666;           /* 浅色文字 */
+  --text-color-lighter: #999;         /* 更浅文字 */
+  --text-color-white: #ffffff;
+  
+  /* 背景色 */
+  --background-color: #f9f9f9;        /* 默认背景 */
+  --background-color-dark: #2e2e2e;   /* 夜间背景 */
+  --background-color-sider: #f0f3f6;
+  --background-color-sider-dark: #2e2e2e;
+  --background-color-sider: #f7f9fc;
+
+  /* 边框 */
+  --border-color: #e0e0e0;            /* 边框颜色 */
+  
+  /* 间距（基于 8px 单位） */
+  --spacing-unit: 8px;
+  --spacing-xs: calc(var(--spacing-unit) * 0.5);   /* 4px */
+  --spacing-sm: calc(var(--spacing-unit) * 1.5);   /* 12px */
+  --spacing-md: calc(var(--spacing-unit) * 2);     /* 16px */
+  --spacing-lg: calc(var(--spacing-unit) * 3);     /* 24px */
+  --spacing-xl: calc(var(--spacing-unit) * 4);     /* 32px */
+  
+  /* 字体大小 */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 24px;
+  --font-size-xxl: 32px;
+  --font-size-xxxl: 48px;
+
+/* 字体厚度 */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
+  /* 线宽 */
+  --line-width-sm: 1px;
+  --line-width-md: 2px;
+  --line-width-lg: 4px;
+  
+/* 图片 */
+ --image-size-sm: 16px;
+ --image-size-md: 24px;
+ --image-size-lg: 32px;
+ --image-size-xl: 48px;
+ --image-size-xxl: 64px;
+
+
+
+/* 图标大小 */
+--icon-size-sm: 16px;
+--icon-size-md: 20px;
+--icon-size-lg: 24px;
+
+
+  /* 圆角 */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  
+  /* 阴影 */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+  
+  /* 动画 */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+/* ==================== 夜间模式 ==================== */
+[data-theme="dark"] {
+  --primary-color: #ff4d4f;           /* 暗红色 */
+  --background-color: #2e2e2e;        /* 深灰背景 */
+  --text-color: #f0f0f0;              /* 亮色文字 */
+  --text-color-light: #cccccc;
+  --text-color-lighter: #aaaaaa;
+  --border-color: #444;
+}
