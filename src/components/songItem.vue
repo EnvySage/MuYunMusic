@@ -28,10 +28,6 @@ const props = defineProps({
     type: String,
     default: ''
   },
-  iconText: {
-    type: String,
-    default: ''
-  },
   text: {
     type: String,
     required: true
@@ -66,17 +62,19 @@ const handleClick = () => {
   transition: background-color 0.2s ease;
   border-radius: 10px;
   &:hover {
-    background-color: #e4e8ec;
+    background-color: var(--background-color-sider-hover);
   }
   &.selected {
     background-color: #ff4d4d;
     color: white;
     
     .menu-icon img,
-    .menu-font,
     .menu-iconfont,
     .menu-text {
       color: white;
+    }
+    .menu-font{
+      filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg);
     }
     
 
@@ -110,6 +108,7 @@ const handleClick = () => {
     .iconfont{ 
         font-size: var(--font-size-xl);
     }
+ 
 }
 
 
