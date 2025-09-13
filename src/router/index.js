@@ -7,8 +7,13 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: () => import('@/layout/HomePage/layout.vue'),
+      children: [
+        {
+          path: '',
+          name: 'recommend',
+          component: () => import('@/layout/HomePage/view/recommend.vue'),
+        }],
     }
-
   ],
 })
 

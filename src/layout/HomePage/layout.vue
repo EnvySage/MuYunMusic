@@ -8,20 +8,11 @@
                 <Sider></Sider>
             </el-splitter-panel>
             <el-splitter-panel :min="800">
-                
-                <MenuCard 
-        :bg-image=Card1
-        song-title="今天《雪の降らない星》差sdasadssdasdadsdsaadssdas"
-        song-artist="不経耳"
-        :tracks="[
-        { name: 'おしんこ' },
-        { name: '雪の降らない星' },
-        { name: 'すずめ feat.十明' }
-        ]"
-        />
+                <router-view></router-view>
             </el-splitter-panel>
         </el-splitter>
         <div class="footer">
+            <Footer></Footer>
         </div>
     </div>
 </template>
@@ -29,9 +20,21 @@
 <script setup>
 import Header from './header.vue';
 import Sider from './sider.vue';
-import Card1 from "@/image/SongMenuImg/Card1.jpg"
-import MenuCard from '@/components/songMenuCard.vue'
+import Footer from './footer.vue';
 </script>
 
 <style lang="scss" scoped>
+.layout {
+    transform: translate(0,0);
+}
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 98%;
+  max-width: 100vw;
+  z-index: 1000;
+  right: 0;
+  left: 0;
+  box-sizing: border-box;
+}
 </style>

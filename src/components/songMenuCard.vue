@@ -1,10 +1,11 @@
 <template>
   <div class="music-card" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
+    <div class="card-title" v-show="CardTitle">{{ CardTitle ? CardTitle : ''  }}</div>
     <!-- 背景图 -->
     <div class="card-background" :style="{ backgroundImage: `url(${bgImage})` }"></div>
     
     <!-- 悬停时显示的内容 -->
-    <div class="hover-content">
+    <div :class="['hover-content', isHovered ? 'show' : '']">
       <div class="song-info">
         <div class="song-title">{{ songTitle }}</div>
         <div class="song-artist">{{ songArtist }}</div>
@@ -20,7 +21,7 @@
       
       <!-- 播放按钮 -->
       <div class="play-button" @click="handlePlay">
-        <div class="icon-play"></div>
+        <div class="iconfont icon-bofang1"></div>
       </div>
     </div>
   </div>
@@ -30,17 +31,21 @@
 import { ref } from 'vue';
 
 const props = defineProps({
+  CardTitle: {
+    type: String,
+    default: ''
+  },
   bgImage: {
     type: String,
     default: ''
   },
   songTitle: {
     type: String,
-    default: '今天《雪の降らない星》差jsjssjsjsjjs'
+    default: '歌单名字'
   },
   songArtist: {
     type: String,
-    default: '不経耳'
+    default: '歌单作者'
   },
   tracks: {
     type: Array,
@@ -51,7 +56,7 @@ const props = defineProps({
     ]
   }
 });
-
+const isHovered = ref(false);
 const handleMouseEnter = () => {
   isHovered.value = true;
 };
@@ -97,24 +102,32 @@ const handlePlay = () => {
   left: 0;
   right: 0;
   bottom: 0;
-  height: 45px;
+  height: 60px;
   backdrop-filter: blur(100px);
   z-index: 2;
 }
 
 .hover-content {
   position: absolute;
-  top: calc(100% - 60px);
+  top: calc(100% - 145px);
   left: 0;
   right: 0;
   bottom: -80%;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
+  backdrop-filter: blur(30px);
+  -webkit-mask: linear-gradient(to top, black 60%, transparent);
+  mask: linear-gradient(to top, black 60%, transparent);
+  color: var(--text-color-white);
   padding: 16px;
   z-index: 3;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: all 0.5s ease;
+  padding-top: 50%;
+}
+.show {
+  top: 0;
+  bottom: 0;
 }
 
 .song-info {
@@ -126,7 +139,6 @@ const handlePlay = () => {
   font-weight: bold;
   margin-bottom: 4px;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  /* 限制最多显示两行 */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
@@ -166,6 +178,9 @@ const handlePlay = () => {
 }
 
 .play-button {
+  position: absolute;
+  bottom: 5%;
+  right: 5%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -179,7 +194,7 @@ const handlePlay = () => {
 }
 
 .play-button:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .icon-play {
@@ -189,4 +204,16 @@ const handlePlay = () => {
   background-size: contain;
   background-repeat: no-repeat;
 }
+.card-title { 
+  position: absolute;
+  color: var(--text-color-white);
+  font-weight: bolder;
+  z-index: 7;
+  width: 100%;
+  padding: 10px;
+  background:linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 90%, transparent);
+}
+
+
+
 </style>

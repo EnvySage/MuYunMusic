@@ -8,7 +8,7 @@
   /* 文字颜色 */
   --text-color: #000000ff;                 /* 主要文字 */
   --text-color-light: #666;           /* 浅色文字 */
-  --text-color-lighter: #999;         /* 更浅文字 */
+  --text-color-lighter: #c2c1c1ff;         /* 更浅文字 */
   --text-color-white: #ffffff;
   
   /* 背景色 */
@@ -43,6 +43,7 @@
   --font-weight-light: 300;
   --font-weight-normal: 400;
   --font-weight-bold: 700;
+  --font-weight-border: 900;
   /* 线宽 */
   --line-width-sm: 1px;
   --line-width-md: 2px;
