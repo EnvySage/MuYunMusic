@@ -112,7 +112,7 @@ const handleClick = () => {
     justify-content: flex-start;
     background-color: rgba(0, 0, 0, 0.3);
   position: absolute;
-  width: 120px; 
+  width: 100%; 
   padding: 5px 10px; 
   color: var(--text-color-white);
   top:0;

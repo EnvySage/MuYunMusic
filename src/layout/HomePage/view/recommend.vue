@@ -66,7 +66,7 @@
             </div>
         </div>
         <div class="recommendSongSpecial">
-            <div class="CardList-title">精选推荐</div>
+            <div class="CardList-title">推荐歌单</div>
             <div class="CardList">
                 <song-menu-card CardTitle="每日推荐" :bg-image=Card1 song-title="断捨離 (feat. りりあ。)" song-artist="来自日推"
                     :tracks="[
@@ -113,6 +113,13 @@
 
             </div>
         </div>
+        <div class="rankList">
+            <div class="CardList-title">排行榜</div>
+            <div class="CardList">
+                <rankList v-for="(rank, index) in rankLists" :key="index" :title="rank.title"
+                    :update-frequency="rank.updateFrequency" :songs="rank.songs" />
+            </div>
+        </div>
 
     </div>
 </template>
@@ -126,6 +133,8 @@ import pic5 from '@/image/Carousel/pic5.png'
 import Card1 from '@/image/SongMenuImg/Card1.jpg'
 import RecommendCard from '@/components/recommendCard.vue'
 import SongMenuCard from '@/components/songMenuCard.vue'
+import rankList from '@/components/rankList.vue'
+import avatar from '@/image/avatar.png'
 const carouselData = [
     pic1,
     pic2,
@@ -159,14 +168,49 @@ const recommendCards = [
         subtitle: '播客'
     }
 ];
+const songsData = [
+    {
+        id: 1,
+        name: '沦陷',
+        artist: '李嘉格',
+        cover: avatar,
+        isNew: false
+    },
+    {
+        id: 2,
+        name: '晨昏线',
+        artist: '梓渝',
+        cover: avatar,
+        isNew: true
+    },
+    {
+        id: 3,
+        name: '时间就是伤口',
+        artist: '范世錡',
+        cover: avatar,
+        isNew: true
+    }
+]
+const rankLists = [
+    { title: '飙升榜', updateFrequency: '每天更新', songs: songsData },
+    { title: '新歌榜', updateFrequency: '每天更新', songs: songsData },
+    { title: '热歌榜', updateFrequency: '每天更新', songs: songsData },
+    { title: '原创榜', updateFrequency: '每周四更新', songs: songsData },
+    { title: '数字专辑畅销榜', updateFrequency: '每30分钟更新', songs: songsData },
+    { title: '歌曲畅销指数榜', updateFrequency: '每1小时更新', songs: songsData }
+];
+const handlePlay = (song) => {
+    console.log('Playing song:', song);
+};
 </script>
 
 <style lang="scss" scoped>
 .container {
     margin: 1% 5%;
     width: 90%;
-    height: 100%;
+    // overflow: hidden;
     background-color: var(--background-color-sider);
+    padding-bottom: 100px;
 }
 
 .header {
@@ -223,7 +267,37 @@ const recommendCards = [
     .CardList {
         display: flex;
         width: 100%;
-        justify-content: space-between;
+        gap: var(--spacing-xl);
+    }
+}
+
+.rankList {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .CardList-title {
+        font-size: var(--font-size-xl);
+        font-weight: var(--font-weight-border);
+        color: var(--text-color-light);
+        margin: 20px 0;
+    }
+
+    .CardList {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--spacing-xl);
+        width: 100%;
+
+        // 平板设备
+        @media (max-width: 1200px) {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        // 手机设备
+        @media (max-width: 768px) {
+            grid-template-columns: 1fr;
+        }
     }
 }
 </style>

@@ -1,7 +1,10 @@
 
 @import 'variable.css';
-@import url('//at.alicdn.com/t/c/font_5019718_2zxyfqvz3ns.css');
+@import url('//at.alicdn.com/t/c/font_5019718_j5o3m51ii3.css');
 /* 全局样式 */
+* { 
+  box-sizing: border-box; 
+}
 body {
   margin: 0;
   background-color: var(--background-color);
