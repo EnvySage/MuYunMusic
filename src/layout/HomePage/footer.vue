@@ -1,50 +1,60 @@
 <template>
-    <div class="playControlContainer" :style="{'backgroundColor': lyricStore.lyricPage ? 'transparent' : 'white'}">
+    <div class="playControlContainer" :style="{ 'backgroundColor': lyricStore.lyricPage ? 'transparent' : 'white' }">
         <div class="audioProgressShow" v-if="lyricStore.lyricPage">
-            <el-slider v-model="progressValue" :min="0" :max="100" :step="1" @change="onProgressChange" @input="onProgressInput" />
+            <el-slider v-model="progressValue" :min="0" :max="100" :step="1" @change="onProgressChange"
+                @input="onProgressInput" />
         </div>
         <div class="albumContainer">
-            <img :src="avatar" alt="" @click="lyricStore.toggleLyricPage()" v-if="!lyricStore.lyricPage">
+            <img :src="musicPlayerStore.currentSong.cover" alt="" @click="lyricStore.toggleLyricPage()"
+                v-if="!lyricStore.lyricPage"
+                :style="{ '--album-rotation-state': musicPlayerStore.isPlaying ? 'runing' : 'paused' }">
             <div class="album">
                 <div class="albumInfo" v-if="!lyricStore.lyricPage">
-                    <div class="albumName">{{ currentSong.title }}</div>
+                    <div class="albumName">{{ musicPlayerStore.currentSong.title }}</div>
                     -
-                    <div class="albumAuthor">{{ currentSong.artist }}</div>
+                    <div class="albumAuthor">{{ musicPlayerStore.currentSong.artist }}</div>
                 </div>
-                <div class="albumFunction" :style="{'filter': lyricStore.lyricPage ? 'invert(100%)' : 'invert(0%)' }">
+                <div class="albumFunction" :style="{ 'filter': lyricStore.lyricPage ? 'invert(100%)' : 'invert(0%)' }">
                     <div class="iconfont icon-piliangguanli"></div>
                     <div class="iconfont icon-pinglun"></div>
                     <div class="iconfont icon-fenxiang"></div>
                     <div class="iconfont icon-xiazai"></div>
-                                    <div class="time-text" v-if="lyricStore.lyricPage">
-                    {{ formattedCurrentTime }} / {{ formattedDuration }}
-                </div>
+                    <div class="time-text" v-if="lyricStore.lyricPage">
+                        {{ formattedCurrentTime }} / {{ formattedDuration }}
+                    </div>
                 </div>
             </div>
         </div>
         <div class="audioControllContainer">
-            <div class="audioControl" :style="{'filter': lyricStore.lyricPage ? 'invert(100%)' : 'invert(0%)'}">
+            <div class="audioControl" :style="{ 'filter': lyricStore.lyricPage ? 'invert(100%)' : 'invert(0%)' }">
                 <div class="iconfont icon-dianzan-xiankuang"></div>
                 <div class="iconfont icon-shangyiji"></div>
-                <div class="iconfont" :class="isPlaying ? 'icon-zanting1' : 'icon-bofang1'"
+                <div class="iconfont" :class="musicPlayerStore.isPlaying ? 'icon-zanting1' : 'icon-bofang1'"
                     style="padding: 5px; background-color: red; border-radius: 50%; color: white;" @click="togglePlay"
-                    :style="{'filter': lyricStore.lyricPage ? 'invert(100%)' : 'invert(0%)'}">
+                    :style="{ 'filter': lyricStore.lyricPage ? 'invert(100%)' : 'invert(0%)' }">
                 </div>
                 <div class="iconfont icon-xiayiji"></div>
                 <div class="iconfont icon-suijibofang"></div>
             </div>
             <div class="audioProgress" v-if="!lyricStore.lyricPage">
-                <el-slider v-model="progressValue" :min="0" :max="100" :step="1" @change="onProgressChange" @input="onProgressInput" />
+                <el-slider v-model="progressValue" :min="0" :max="100" :step="1" @change="onProgressChange"
+                    @input="onProgressInput" />
                 <div class="time-text">
                     {{ formattedCurrentTime }} / {{ formattedDuration }}
                 </div>
             </div>
         </div>
         <div class="extraFunctionContainer">
-            <div class="extraFunction" :style="{'filter': lyricStore.lyricPage ? 'invert(100%)' : 'invert(0%)'}">
+            <div class="extraFunction" :style="{ 'filter': lyricStore.lyricPage ? 'invert(100%)' : 'invert(0%)' }">
                 <div class="iconfont icon-geci" style="font-size: 2.5rem;" @click="lyricStore.toggleLyricPage()"></div>
                 <div class="iconfont icon-yinxiao" style="font-size: 2rem;"></div>
-                <div class="iconfont icon-yinliangxiao"></div>
+                <div class="controlVolume">
+                    <div class="volume-panel" v-show="showVolumePanel" ref="volumePanel">
+                        <el-slider v-model="volumeValue" :min="0" :max="100" :vertical="true" height="100px"
+                            @change="onVolumeChange" />
+                    </div>
+                    <div class="iconfont icon-yinliangxiao" @click="toggleVolumePanel" ref="volumeIcon"></div>
+                </div>
                 <div class="iconfont icon-bofangduilie"></div>
             </div>
         </div>
@@ -52,53 +62,99 @@
 </template>
 
 <script setup>
-import avatar from '@/image/avatar.png'
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useMusicPlayerStore } from '@/stores/musicPlayer'
 import { useLyricStore } from '@/stores/lyric'
 
 const musicPlayerStore = useMusicPlayerStore()
 const lyricStore = useLyricStore()
 
-// 计算属性
-const isPlaying = computed(() => musicPlayerStore.isPlaying)
-const currentTime = computed(() => musicPlayerStore.currentTime)
-const duration = computed(() => musicPlayerStore.duration)
+// 音量控制相关
+const showVolumePanel = ref(false)
+const volumeValue = ref(musicPlayerStore.volume * 100)
+const volumeIcon = ref(null)
+const volumePanel = ref(null)
+
+// 切换音量面板显示
+const toggleVolumePanel = (event) => {
+    event.stopPropagation()
+    showVolumePanel.value = !showVolumePanel.value
+}
+
+// 音量变化处理
+const onVolumeChange = (value) => {
+    volumeValue.value = value
+    musicPlayerStore.volume = value / 100
+    if (musicPlayerStore.audioElement) {
+        musicPlayerStore.audioElement.volume = value / 100
+    }
+}
+
+// 点击外部关闭音量面板
+const handleClickOutside = (event) => {
+    if (showVolumePanel.value &&
+        volumeIcon.value &&
+        volumePanel.value &&
+        !volumeIcon.value.contains(event.target) &&
+        !volumePanel.value.contains(event.target)) {
+        showVolumePanel.value = false
+    }
+}
+
+watch(() => musicPlayerStore.volume, (newVolume) => {
+    volumeValue.value = newVolume * 100
+})
+
+// 挂载时添加事件监听器
+onMounted(() => {
+    document.addEventListener('click', handleClickOutside)
+})
+
+// 卸载前移除事件监听器
+onBeforeUnmount(() => {
+    document.removeEventListener('click', handleClickOutside)
+})
 
 // 格式化时间
 const formatTime = (seconds) => {
-    if (!seconds) return '0:00'
+    // 添加更完善的边界检查
+    if (seconds === null || seconds === undefined || isNaN(seconds) || seconds < 0) return '0:00'
     const mins = Math.floor(seconds / 60)
     const secs = Math.floor(seconds % 60)
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`
 }
 
-const formattedCurrentTime = computed(() => formatTime(currentTime.value))
-const formattedDuration = computed(() => formatTime(duration.value))
+const formattedCurrentTime = computed(() => formatTime(musicPlayerStore.currentTime))
+const formattedDuration = computed(() => formatTime(musicPlayerStore.duration))
 const isDragging = ref(false)
-const dragValue = ref(0) 
+const dragValue = ref(0)
+
+// 修复进度条在页面切换后无法使用的问题
 const progressValue = computed({
-  get: () => {
-    if (!duration.value) return 0
+    get: () => {
+        // 添加边界检查
+        if (!musicPlayerStore.duration || musicPlayerStore.duration <= 0) return 0
         if (isDragging.value) {
-      return dragValue.value
-    }
-    const percent = (currentTime.value / duration.value) * 100
-    return Math.round(percent * 10) / 10 // 保留一位小数
-  },
-  set: (value) => {
+            return dragValue.value
+        }
+        const percent = (musicPlayerStore.currentTime / musicPlayerStore.duration) * 100
+        return isNaN(percent) ? 0 : Math.min(100, Math.max(0, Math.round(percent * 10) / 10)) // 限制在0-100范围内
+    },
+    set: (value) => {
         if (isDragging.value) {
-      dragValue.value = value
-      return
+            dragValue.value = value
+            return
+        }
+
+        // 添加音频元素存在性检查
+        if (musicPlayerStore.audioElement && musicPlayerStore.duration > 0) {
+            const seekTime = (value / 100) * musicPlayerStore.duration
+            // 只有当变化超过 0.1 秒时才更新
+            if (Math.abs(seekTime - musicPlayerStore.currentTime) > 0.1) {
+                musicPlayerStore.audioElement.currentTime = seekTime
+            }
+        }
     }
-  if (!isDragging.value && musicPlayerStore.audioElement) {
-    const seekTime = (value / 100) * duration.value
-    // 只有当变化超过 0.1 秒时才更新
-    if (Math.abs(seekTime - currentTime.value) > 0.1) {
-      musicPlayerStore.audioElement.currentTime = seekTime
-    }
-  }
-}
 })
 
 // 播放/暂停切换
@@ -107,28 +163,33 @@ const togglePlay = () => {
 }
 
 const onProgressInput = (value) => {
-  isDragging.value = true
-  dragValue.value = value
+    isDragging.value = true
+    dragValue.value = value
 }
 
 const onProgressChange = (value) => {
-  isDragging.value = false
+    isDragging.value = false
     dragValue.value = value
-  
-  // 在这里直接更新音频位置，而不是依赖 progressValue.set
-  if (musicPlayerStore.audioElement && duration.value) {
-    const seekTime = (value / 100) * duration.value
-    musicPlayerStore.audioElement.currentTime = seekTime
-  }
+
+    // 添加音频元素存在性检查
+    if (musicPlayerStore.audioElement && musicPlayerStore.duration > 0) {
+        const seekTime = (value / 100) * musicPlayerStore.duration
+        musicPlayerStore.audioElement.currentTime = seekTime
+    }
 }
 
-// 歌曲信息（示例）
-const currentSong = ref({
-    title: '晚餐歌',
-    artist: 'tuki.'
-})
+// 监听音频元素变化，确保进度条正常工作
+watch(() => musicPlayerStore.audioElement, (newAudioElement) => {
+    if (newAudioElement) {
+        // 确保音频元素状态同步
+        musicPlayerStore.setPlayingState(!newAudioElement.paused)
+        musicPlayerStore.setDuration(newAudioElement.duration || 0)
+        musicPlayerStore.setCurrentTime(newAudioElement.currentTime || 0)
+    }
+}, { immediate: true })
 
 </script>
+
 <style lang="scss" scoped>
 .playControlContainer {
     width: 100%;
@@ -152,6 +213,7 @@ const currentSong = ref({
         align-items: center;
         gap: var(--spacing-xs);
         width: 100%;
+
         :deep(.el-slider) {
             --el-slider-main-bg-color: red;
             --el-slider-runway-bg-color: #ddd;
@@ -199,6 +261,19 @@ const currentSong = ref({
             object-fit: cover;
             border-radius: 50%;
             box-shadow: 0 0 0 10px black;
+            cursor: pointer;
+            animation: rotateAlbum 20s linear infinite;
+            animation-play-state: var(--album-rotation-state, paused);
+        }
+
+        @keyframes rotateAlbum {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .album {
@@ -227,13 +302,15 @@ const currentSong = ref({
                 display: flex;
                 gap: var(--spacing-md);
                 align-items: center;
+
                 .iconfont {
                     font-size: var(--font-size-xl);
-                    filter: invert(50%)
+                    filter: invert(50%);
+                    cursor: pointer;
                 }
 
                 .iconfont:hover {
-                    filter: invert(0)
+                    filter: invert(0);
                 }
             }
         }
@@ -254,6 +331,7 @@ const currentSong = ref({
             .iconfont {
                 font-size: var(--font-size-xl);
                 transition: all 0.3s ease;
+                cursor: pointer;
             }
 
             .iconfont:not(:nth-child(3)):hover {
@@ -305,6 +383,8 @@ const currentSong = ref({
 
             .time-text {
                 display: flex;
+                font-size: 12px;
+                color: #666;
             }
         }
     }
@@ -312,6 +392,15 @@ const currentSong = ref({
     .extraFunctionContainer {
         display: flex;
         align-items: center;
+        position: relative;
+        .controlVolume { 
+            display: flex;
+            gap: var(--spacing-md);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
 
         .extraFunction {
             display: flex;
@@ -322,10 +411,45 @@ const currentSong = ref({
                 font-size: var(--font-size-xl);
                 filter: invert(50%);
                 transition: all 0.3s ease;
+                cursor: pointer;
             }
 
             .iconfont:hover {
                 filter: invert(0);
+            }
+        }
+
+    }
+    // 音量控制面板样式
+    .volume-panel {
+        position: absolute;
+        bottom: 30px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        padding: 15px 1px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        z-index: 1000;
+
+        :deep(.el-slider) {
+            --el-slider-main-bg-color: red;
+            --el-slider-runway-bg-color: #ddd;
+
+            .el-slider__runway {
+                width: 6px;
+            }
+
+            .el-slider__bar {
+                width: 6px;
+            }
+
+            .el-slider__button {
+                width: 16px;
+                height: 16px;
+                border: none;
+                background-color: white;
+                border-radius: 50%;
+                box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
             }
         }
     }

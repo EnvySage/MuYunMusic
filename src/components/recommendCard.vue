@@ -42,7 +42,7 @@ const handleClick = () => {
 <style scoped>
 .recommend-card {
     position: relative;
-  width: 140px;
+  width: 100%;
     height: 140px;
   border-radius: 8px;
   overflow: hidden;

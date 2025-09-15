@@ -2,147 +2,17 @@
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useMusicPlayerStore } from '@/stores/musicPlayer'
 import { useLyricStore } from '@/stores/lyric'
-import music from '../../image/Music/晚餐歌.mp3'
+
 // 响应式状态
 const musicPlayerStore = useMusicPlayerStore()
 const lyricStore = useLyricStore()
-const audioElement = ref(null)
-const isPlaying = ref(false)
-const currentTime = ref(0)
-const duration = ref(0)
-const volume = ref(0.8)
-const isLoading = ref(false)
-const lyricOffset = ref(0) // 可调整的歌词偏移量
 
-// 音频文件路径
-const audioUrl = music
 onMounted(() => {
-  if (audioElement.value) {
-    musicPlayerStore.setAudioElement(audioElement.value)
-  }
+    // 初始化歌曲信息
 })
-// LRC 歌词文本
-const lrcText = ref(`[00:00.000]作词 : tuki.
-[00:00.490]作曲 : tuki.
-[00:00.980]编曲 : tuki.
-[00:01.470]晚餐歌 (弾き語りver) - tuki.
-[00:05.270]词：tuki.
-[00:06.210]曲：tuki.
-[00:10.230]君を泣かすから
-[00:10.230]因为我会让你哭泣
-[00:11.830]だから一緒には居れないな
-[00:11.830]所以我才没有办法与你在一起
-[00:14.830]君を泣かすから
-[00:14.830]因为我会让你哭泣
-[00:16.560]早く忘れて欲しいんだ
-[00:16.560]所以希我才希望你快点忘记我
-[00:19.640]人間だからね
-[00:19.640]正因为是人啊
-[00:21.690]たまには違うものも食べたいね
-[00:21.690]所以偶尔也会想尝试些不同的食物
-[00:24.490]君を泣かすから
-[00:24.490]因为我会让你哭泣
-[00:26.530]そう君を泣かすから
-[00:26.530]はあ 请不要再哭泣了
-[00:28.680]でも味気ないないないんだよね
-[00:28.680]但你我也都觉得索然无味了吧
-[00:31.620]会い会い会いたくなんだよね
-[00:31.620]也愈发想去见除对方以外的人了吧
-[00:34.010]君以外会いたくないんだよね
-[00:34.010]我却在抗拒见除你以外的人
-[00:36.320]なんて勝手だね
-[00:36.320]真是何等自私的一份爱啊
-[00:38.960]大体曖昧なんだよね
-[00:38.960]感情就是这样模糊不清的
-[00:41.240]愛の存在証明なんて
-[00:41.240]但这份爱确切存在着の证明
-[00:44.060]君が教えてくれないか
-[00:44.060]可以请你告诉我吗
-[00:48.380]何十回の夜を過ごしたって
-[00:48.380]哪怕经历几十次夜晚降临の煎熬
-[00:51.490]得られぬような
-[00:51.490]我也无法得到
-[00:53.720]愛してるを並べてみて
-[00:53.720]排列出の"我爱你"三个字
-[00:58.340]何十回の夜を過ごしたって
-[00:58.340]哪怕经历几十次夜晚降临の煎熬
-[01:01.360]得られぬような
-[01:01.360]我也无法得到
-[01:03.520]最高のフルコースを頂戴
-[01:03.520]赐予我的那样美好的盛宴
-[01:18.410]君を泣かすから
-[01:18.410]因为我会让你哭泣
-[01:20.240]きっと一生は無理だよね
-[01:20.240]所以一直在一起も一定是不行の吧
-[01:23.260]君を泣かすから
-[01:23.260]因为我会让你哭泣
-[01:25.000]胸がとても痛くなんだ
-[01:25.000]所以这颗心才会疼痛无比
-[01:28.100]人間だからね
-[01:28.100]正因为は人啊
-[01:30.180]たまには分かり合えなくなって
-[01:30.180]所以偶尔也会无法相互理解
-[01:32.860]君を泣かすから
-[01:32.860]因为我会让你哭泣
-[01:34.980]また君を泣かすから
-[01:34.980]はあ 我又害你哭泣了
-[01:37.150]でも自信がないないないんだよね
-[01:37.150]但是你我都对自己没有自信
-[01:40.170]変わりたくないないないんだよね
-[01:40.170]希望着当下的一切都不要改变
-[01:42.530]君以外会いたくないんだよね
-[01:42.530]我又在抗拒着見除你以外の人
-[01:44.880]なんて勝手だね
-[01:44.880]这份愛果然很自私あ
-[01:47.610]大体曖昧だったよね
-[01:47.610]感情就是这样模糊不清の
-[01:49.740]愛の存在証明なんて
-[01:49.740]但这份愛确切存在着の证明
-[01:52.580]君がそこに居るのにね
-[01:52.580]は明明近在我身边的你吗
-[01:56.860]何百回の夜を過ごしたって
-[01:56.860]哪怕经历数百次夜晚降临の煎熬
-[01:59.940]得られぬような
-[02:02.030]愛してるを並べてみて
-[02:02.030]排列出の"我爱你"三个字
-[02:06.650]何百回の夜を過ごしたって
-[02:06.650]哪怕经历数百次夜晚降临の煎熬
-[02:09.680]得られぬような
-[02:09.680]我也无法得到
-[02:11.880]最高のフルコースを頂戴
-[02:11.880]赐予我的那样美好的盛宴
-[02:16.890]離れないで 傍に居てくれたのは
-[02:16.890]不曾离去の 在我身旁陪伴着の
-[02:21.890]結局君一人だったよね
-[02:21.890]只剩着你一直愛着我
-[02:26.850]涙のスパイスは君の胸に
-[02:26.850]如辛香料般的泪水渗入你的心
-[02:31.880]残ってしまうだろうけど
-[02:31.880]会在那里留下余香吗
-[02:36.600]何千回の夜を過ごしたって
-[02:36.600]哪怕经历成千次夜晚降临の煎熬
-[02:39.830]得られぬような
-[02:39.830]我也无法忘却
-[03:02.040]愛してるを並べるから
-[03:02.040]排列出の"我爱你"三个字
-[03:06.730]何千回の夜を過ごしたって
-[03:06.730]哪怕经历成千次夜晚降临の煎熬
-[03:09.760]得られぬような
-[03:09.760]我也无法忘却
-[03:11.940]最高のフルコースを
-[03:11.940]那样美好的盛宴あ
-[02:56.840]何万回の夜を過ごしたって
-[02:56.840]哪怕经历上万次夜晚降临の煎熬
-[02:59.840]忘れぬような
-[03:02.040]愛してるを並べるから
-[03:02.040]排列出の"我爱你"三个字
-[03:06.730]何万回の夜を過ごしたって
-[03:06.730]哪怕经历上万次夜晚降临の煎熬
-[03:09.760]忘れぬような
-[03:09.760]我也无法忘却
-[03:11.940]最高のフルコースを頂戴
-[03:11.940]赐予我的那样美好的盛宴`
-)
+
+// LRC 歌词文本 (从store获取)
+const lrcText = computed(() => musicPlayerStore.lyricText)
 
 // 改進の歌词解析函数
 const parseLRC = (lrcText) => {
@@ -194,7 +64,7 @@ const parseLRC = (lrcText) => {
     // 当同时有日文和中文时，添加到歌词列表
     if (currentTime !== null && currentJapanese && currentChinese) {
       lyrics.push({
-        time: currentTime + lyricOffset.value,
+        time: currentTime + musicPlayerStore.lyricOffset,
         originalTime: currentTime,
         japanese: currentJapanese,
         chinese: currentChinese
@@ -242,51 +112,20 @@ const findCurrentLyricIndex = (lyrics, currentTime) => {
 
 // 计算属性
 const parsedLyrics = computed(() => parseLRC(lrcText.value))
-const currentLyricIndex = computed(() => findCurrentLyricIndex(parsedLyrics.value, currentTime.value))
-const progressPercentage = computed(() => (currentTime.value / duration.value) * 100 || 0)
-const formattedCurrentTime = computed(() => formatTime(currentTime.value))
-const formattedDuration = computed(() => formatTime(duration.value))
+const currentLyricIndex = computed(() => findCurrentLyricIndex(parsedLyrics.value, musicPlayerStore.currentTime))
 
 // 歌曲信息
 const songInfo = computed(() => {
-  const titleMatch = lrcText.value.match(/\[.*?\](.+?)\s*-/)
   return {
-    title: titleMatch ? titleMatch[1].trim() : '晚餐歌',
-    artist: 'tuki.'
+    title: musicPlayerStore.currentSong.title,
+    artist: musicPlayerStore.currentSong.artist
   }
 })
 
 
 
-const handleTimeUpdate = () => {
-  currentTime.value = audioElement.value.currentTime
-  musicPlayerStore.setCurrentTime(currentTime.value) // 更新store
-}
 
-const handleLoadedMetadata = () => {
-  duration.value = audioElement.value.duration
-  musicPlayerStore.setDuration(duration.value) // 更新store
-  isLoading.value = false
-}
 
-const handlePlay = () => {
-  isPlaying.value = true
-  musicPlayerStore.setPlayingState(true) // 更新store的状态
-}
-
-const handlePause = () => {
-  isPlaying.value = false
-  musicPlayerStore.setPlayingState(false)
-}
-
-const handleEnded = () => {
-  isPlaying.value = false
-  currentTime.value = 0
-}
-
-const handleLoadStart = () => {
-  isLoading.value = true
-}
 
 // 自動滚动歌词（带平滑滚动）
 const scrollToCurrentLyric = () => {
@@ -315,40 +154,35 @@ watch(currentLyricIndex, (newVal, oldVal) => {
   if (newVal !== oldVal) {
     nextTick(scrollToCurrentLyric);
   }
+},{
+  immediate: true
 })
 
 // 调整歌词偏移量
 const adjustLyricOffset = (delta) => {
-  lyricOffset.value += delta
-  console.log(`歌词偏移量調整为: ${lyricOffset.value.toFixed(2)}秒`)
+  musicPlayerStore.adjustLyricOffset(delta)
 }
-
-import albumCover from '@/image/Music/晚餐歌.jpg'
 </script>
 
 <template>
-  <div class="LyricBox" :style="{ backgroundImage: `url(${albumCover})` }">
+  <div class="LyricBox" :style="{ backgroundImage: `url(${musicPlayerStore.currentSong.cover})` }">
     <div class="playerHeader">
       <div class="iconfont icon-fanhui" @click="lyricStore.hideLyricPage()"></div>
     </div>
     <div class="SongBox">
       <div class="albumBox">
         <div class="album-cover">
-          <img :src="albumCover" alt="专辑封面" :style="{'--album-rotation-state' : isPlaying ? 'runing' : 'paused'}">
+          <img :src="musicPlayerStore.currentSong.cover" alt="专辑封面" :style="{'--album-rotation-state' : musicPlayerStore.isPlaying ? 'runing' : 'paused'}">
         </div>
       </div>
       <div class="playerBox">
         <div class="music-player">
-          <!-- 隐藏の音频元素 -->
-          <audio ref="audioElement" :src="audioUrl" @loadedmetadata="handleLoadedMetadata" @timeupdate="handleTimeUpdate"
-            @play="handlePlay" @pause="handlePause" @ended="handleEnded" @loadstart="handleLoadStart"></audio>
-  
           <div class="song-info">
             <h1 class="song-title">{{ songInfo.title }}</h1>
             <div class="song-artist">{{ songInfo.artist }}</div>
             <div class="lyric-offset-control">
               <button @click="adjustLyricOffset(-0.1)">-0.1s</button>
-              <span>偏移: {{ lyricOffset.toFixed(2) }}s</span>
+              <span>偏移: {{ musicPlayerStore.lyricOffset.toFixed(2) }}s</span>
               <button @click="adjustLyricOffset(0.1)">+0.1s</button>
             </div>
           </div>
@@ -678,3 +512,4 @@ import albumCover from '@/image/Music/晚餐歌.jpg'
   text-align: right;
 }
 </style>
+

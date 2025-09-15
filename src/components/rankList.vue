@@ -79,7 +79,7 @@ defineProps({
 <style lang="scss" scoped>
 .music-chart-card {
   width: 100%;
-  min-width: 300px;
+  min-width: 200px;
   max-width: 500px;
   background: #ffffff;
   border-radius: 12px;

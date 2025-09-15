@@ -152,7 +152,7 @@ const toggleCollectedMenu = () => {
   flex-direction: column;
   min-height: 1000px;
   background-color: var(--background-color-sider);
-  padding: 10px;
+  padding: 10px;  
 
   .common {
     display: flex;
@@ -170,21 +170,21 @@ const toggleCollectedMenu = () => {
 
   // 自定义滚动条样式
   &::-webkit-scrollbar {
-    width: 6px; // 滚动条宽度
+    width: 6px; // 增加滚动条宽度
   }
 
   &::-webkit-scrollbar-track {
-    background: var(--secondary-color); // 滚动条背景色
+    background: #f1f1f1; // 修改滚动条背景色
     border-radius: 10px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #c7c7c7; // 滚动条颜色
+    background: #888; // 修改滚动条颜色
     border-radius: 10px;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: #555; // 滚动条悬停颜色
+    background: #555; // 滚动条悬停颜色保持不变
   }
 }
 

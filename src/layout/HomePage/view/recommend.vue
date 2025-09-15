@@ -231,7 +231,7 @@ const handlePlay = (song) => {
     }
 
     .header-recently {
-        width: 40%;
+        width: 50%;
         padding: 10px 20px;
         background-color: white;
         border-radius: 10px;
