@@ -15,9 +15,11 @@
                 </div>
             </div>
             <div class="right">
-                <div class="header-user_bucket">
-                    <div class="user_logo"></div>
-                    <div class="user_name">羡笙</div>
+                <div class="header-user_bucket" @click="handleLogin">
+                    <div class="user_logo">
+                        <img :src="user.avatar" alt="用户图片" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    </div>
+                    <div class="user_name">{{user.name}}</div>
                     <div class="iconfont icon-down"></div>
                 </div>
                 <div class="header-user_function">
@@ -31,12 +33,21 @@
 </template>
 
 <script setup>
-
+import { useUserStore } from '@/stores/user';
+import { useComponentStatusStore } from '@/stores/componentStatus';
+const userStore = useUserStore();
+const componentStatusStore = useComponentStatusStore();
+const user = userStore.user;
+console.log(userStore.user);
+const handleLogin = () => {
+    if(!userStore.isLogin){
+        componentStatusStore.showLoginComponent();
+    }
+}
 </script>
 
 <style lang="scss" scoped>
 .header{
-    padding: 10px;
     background: var(--primary-color);
     display: flex;
     justify-content: space-between;

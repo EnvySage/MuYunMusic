@@ -209,7 +209,7 @@ const handlePlay = (song) => {
     margin: 1% 5%;
     width: 90%;
     // overflow: hidden;
-    background-color: var(--background-color-sider);
+    background-color: var(--background-color);
     padding-bottom: 100px;
 }
 

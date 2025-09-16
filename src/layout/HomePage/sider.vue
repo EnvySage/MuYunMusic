@@ -8,7 +8,7 @@
         :iconfont="item.iconfont"
         :text="item.text" 
         :selected="selectedKey === `common_${index}`" 
-        @click="handleItemClick(`common_${index}`)" 
+        @click="handleItemClick(`common_${index}`,item.id)" 
       />
     </div>
     <div class="own">
@@ -24,7 +24,7 @@
           :iconfont="item.iconfont"
           :text="item.text" 
           :selected="selectedKey === `own_${index}`" 
-          @click="handleItemClick(`own_${index}`)" 
+          @click="handleItemClick(`own_${index}`,item.id)" 
         />
         <div class="more" @click="handleMore">
           <div class="iconfont icon-zhankai"
@@ -47,7 +47,7 @@
           :icon="item.icon" 
           :text="item.text" 
           :selected="selectedKey === `song_${index}`" 
-          @click="handleItemClick(`song_${index}`)" 
+          @click="handleItemClick(`song_${index}`,item.id)" 
         />
       </div>
     </div>
@@ -76,7 +76,8 @@
 import { ref, computed } from 'vue';
 import songItem from '@/components/songItem.vue';
 import avatar from '@/image/avatar.png';
-
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const iconfontList = [{
   iconfont: 'icon-home_fill_light',
   text: '推荐',
@@ -107,6 +108,7 @@ const iconfontList = [{
 }];
 
 const songMenuList = [{
+  id: 1,
   icon: avatar,
   text: '东方',
 }];
@@ -133,9 +135,23 @@ const handleMore = () => {
   }
 };
 
-const handleItemClick = (key) => {
+const handleItemClick = (key,id) => {
   selectedKey.value = key;
-};
+  if (id !== undefined && id !== null) {
+    console.log('跳转到歌单ID:', id);
+    // 使用 name 跳转并传递 params
+    router.push({
+      name: 'songList',
+      params: {
+        id: id,
+      },
+    });
+  }else{
+    router.push({
+      name: 'recommend',
+    })
+  }
+};  
 const MenuStatue = ref(true);
 const toggleMenu = () => {
   MenuStatue.value = !MenuStatue.value;
@@ -151,7 +167,7 @@ const toggleCollectedMenu = () => {
   display: flex;
   flex-direction: column;
   min-height: 1000px;
-  background-color: var(--background-color-sider);
+  background-color: var(--background-color);
   padding: 10px;  
 
   .common {
@@ -160,6 +176,7 @@ const toggleCollectedMenu = () => {
     gap: var(--spacing-xs);
     border-bottom: 1px solid var(--border-color);
   }
+
 }
 
 .infinite-list {
@@ -168,24 +185,6 @@ const toggleCollectedMenu = () => {
   list-style: none;
   scroll-snap-type: none;
 
-  // 自定义滚动条样式
-  &::-webkit-scrollbar {
-    width: 6px; // 增加滚动条宽度
-  }
-
-  &::-webkit-scrollbar-track {
-    background: #f1f1f1; // 修改滚动条背景色
-    border-radius: 10px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #888; // 修改滚动条颜色
-    border-radius: 10px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: #555; // 滚动条悬停颜色保持不变
-  }
 }
 
 .infinite-list .infinite-list-item {

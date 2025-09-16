@@ -12,6 +12,10 @@ const router = createRouter({
           path: '',
           name: 'recommend',
           component: () => import('@/layout/HomePage/view/recommend.vue'),
+        },{
+          path: 'songList/:id',
+          name: 'songList',
+          component: () => import('@/layout/HomePage/view/songList.vue'),
         }],
     }
   ],

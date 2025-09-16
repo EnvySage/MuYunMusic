@@ -83,7 +83,7 @@ const handleClick = () => {
 // 将文本截断样式移到这里，使其在所有状态下都生效
 .menu-text {
   font-size: var(--font-size-lg);
-  color: #333;
+  color: var(--text-color);
   flex: 1;
   display: -webkit-box;
   -webkit-line-clamp: 1;
@@ -95,7 +95,7 @@ const handleClick = () => {
 
 .menu-iconfont {
   font-size: var(--font-size-sm);
-  color: #333;
+  color: var(--text-color);
   flex: 1;
   display: -webkit-box;
   -webkit-line-clamp: 1;

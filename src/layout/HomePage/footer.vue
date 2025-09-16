@@ -55,7 +55,7 @@
                     </div>
                     <div class="iconfont icon-yinliangxiao" @click="toggleVolumePanel" ref="volumeIcon"></div>
                 </div>
-                <div class="iconfont icon-bofangduilie"></div>
+                <div class="iconfont icon-bofangduilie" @click="playerStore.togglePlayer"></div>
             </div>
         </div>
     </div>
@@ -65,10 +65,10 @@
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useMusicPlayerStore } from '@/stores/musicPlayer'
 import { useLyricStore } from '@/stores/lyric'
-
+import { usePlayerStore } from '@/stores/playerList'
 const musicPlayerStore = useMusicPlayerStore()
 const lyricStore = useLyricStore()
-
+const playerStore = usePlayerStore()
 // 音量控制相关
 const showVolumePanel = ref(false)
 const volumeValue = ref(musicPlayerStore.volume * 100)

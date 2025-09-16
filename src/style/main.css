@@ -1,12 +1,52 @@
+/* main.css */
 
 @import 'variable.css';
 @import url('//at.alicdn.com/t/c/font_5019718_j5o3m51ii3.css');
+@import url('//at.alicdn.com/t/c/font_5022358_2fjbsrpsuix.css');
+
 /* 全局样式 */
 * { 
   box-sizing: border-box; 
+  
+  /* Webkit浏览器滚动条样式 */
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 4px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 2px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.5);
+  }
+  
+  /* Firefox滚动条样式 */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
 }
+
+/* 夜间模式滚动条 */
+[data-theme="dark"] *::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+[data-theme="dark"] *::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] {
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
 body {
   margin: 0;
   background-color: var(--background-color);
-  transition: var(--transition-slow); /* 平滑切换主题 */
+  transition: var(--transition-slow);
 }
