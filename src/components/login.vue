@@ -19,8 +19,8 @@
         <el-form-item label="用户名" prop="username">
           <el-input v-model="registerForm.username" placeholder="请输入用户名" />
         </el-form-item>
-        <el-form-item label="邮箱" prop="email">
-          <el-input v-model="registerForm.email" placeholder="请输入邮箱" />
+        <el-form-item label="昵称" prop="nickname">
+          <el-input v-model="registerForm.nickname" placeholder="请输入昵称" />
         </el-form-item>
         <el-form-item label="密码" prop="password">
           <el-input v-model="registerForm.password" type="password" placeholder="请输入密码" show-password />
@@ -46,9 +46,12 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useComponentStatusStore } from '@/stores/componentStatus'
-
+import { useUserStore } from '@/stores/user'
+import request from '@/utils/http'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 const store = useComponentStatusStore()
-
+const userStore = useUserStore()
 // 控制对话框显示
 const dialogVisible = computed({
   get: () => store.LoginComponent,
@@ -71,14 +74,13 @@ const registerFormRef = ref()
 // 登录表单数据
 const loginForm = ref({
   username: '',
-  password: '',
-  remember: false
+  password: ''
 })
 
 // 注册表单数据
 const registerForm = ref({
   username: '',
-  email: '',
+  nickname: '',
   password: '',
   confirmPassword: ''
 })
@@ -87,7 +89,7 @@ const registerForm = ref({
 const loginRules = {
   username: [
     { required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+    { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
@@ -102,8 +104,8 @@ const registerRules = {
     { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
   ],
   email: [
-    { required: true, message: '请输入邮箱地址', trigger: 'blur' },
-    { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
+    { required: true, message: '请输入昵称', trigger: 'blur' },
+    { min:2,max:10, message: '请输入正确的昵称', trigger: 'blur' }
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
@@ -141,7 +143,24 @@ const handleSubmit = () => {
       if (valid) {
         // 执行登录逻辑
         console.log('登录:', loginForm.value)
-        // 这里可以调用登录API
+        request.post('/user/login', loginForm.value).then((res) => {
+          console.log('登录成功:', res)
+          userStore.setUser({
+            id: res.data.id,
+            username: res.data.username,
+            nickname: res.data.nickname,
+            avatarUrl: res.data.avatarUrl,
+            token: res.data.token
+          })
+          localStorage.setItem("token",res.data.token)
+          store.hideLoginComponent()
+          location.reload()
+          ElMessage.success('登录成功')
+          
+        }).catch((err) => {
+          console.log('登录失败:', err)
+          // 登录失败后处理
+        })
       }
     })
   } else {

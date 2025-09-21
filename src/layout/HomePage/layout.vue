@@ -64,7 +64,7 @@ const lyricStore = useLyricStore()
 const musicPlayerStore = useMusicPlayerStore()
 const playerStore = usePlayerStore()
 const audioElement = ref(null)
-
+ 
 onMounted(() => {
   if (audioElement.value) {
     musicPlayerStore.setAudioElement(audioElement.value)

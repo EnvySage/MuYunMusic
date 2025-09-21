@@ -44,8 +44,8 @@
           v-for="(item, index) in songMenuList" 
           :key="`song_${index}`" 
           ItemType="img" 
-          :icon="item.icon" 
-          :text="item.text" 
+          :icon="item.coverUrl" 
+          :text="item.name" 
           :selected="selectedKey === `song_${index}`" 
           @click="handleItemClick(`song_${index}`,item.id)" 
         />
@@ -62,8 +62,8 @@
           v-for="(item, index) in collectedSongMenuList" 
           :key="`collected_${index}`" 
           ItemType="img" 
-          :icon="item.icon" 
-          :text="item.text" 
+          :icon="item.coverUrl" 
+          :text="item.name" 
           :selected="selectedKey === `collected_${index}`" 
           @click="handleItemClick(`collected_${index}`)" 
         />
@@ -73,11 +73,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import songItem from '@/components/songItem.vue';
-import avatar from '@/image/avatar.png';
 import { useRouter } from 'vue-router';
+import { useSongMenuListStore } from '@/stores/songMenuList';
+import { useUserStore } from '@/stores/user';
+const userStore = useUserStore();
+const songMenuListStore = useSongMenuListStore();
 const router = useRouter();
+
 const iconfontList = [{
   iconfont: 'icon-home_fill_light',
   text: '推荐',
@@ -106,19 +110,14 @@ const iconfontList = [{
   iconfont: 'icon-yunpan',
   text: '我的云盘',
 }];
-
-const songMenuList = [{
-  id: 1,
-  icon: avatar,
-  text: '东方',
-}];
-const collectedSongMenuList = [{
-  icon: avatar,
-  text: '古典音乐精选',
-}, {
-  icon: avatar,
-  text: '电影原声大赏',
-}];
+const songMenuList = ref([]);
+const collectedSongMenuList = ref([]);
+onMounted(() => {
+  songMenuList.value.push(...songMenuListStore.songMenuList);
+  collectedSongMenuList.value.push(...songMenuListStore.collectMenuList);
+  console.log(songMenuList.value);
+  console.log(collectedSongMenuList.value);
+});
 const listEnd = ref(8);
 const commonList = computed(() => iconfontList.slice(0, 5));
 const ownList = computed(() => iconfontList.slice(5, listEnd.value));

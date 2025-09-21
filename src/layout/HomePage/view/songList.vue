@@ -2,11 +2,11 @@
     <div class="songListBox">
         <div class="header">
             <div class="imgBox">
-                <img :src="songList.cover" alt="">
+                <img :src="playListData.coverUrl" alt="">
             </div>
             <div class="headerInfo">
                 <div class="titleBox">
-                    <div class="title">{{ songList.name }}</div>
+                    <div class="title">{{ playListData.name }}</div>
                     <div class="subBox">
                         <div class="subImg">
                             <img :src="songList.authorAvatar" alt="">
@@ -36,7 +36,7 @@
         <div class="tab-content">
             <div v-show="activeTab === '1'" class="tab-pane">
                 <div class="song-list-content">
-                    <el-table :data="songList.songs" style="width: 100%"
+                    <el-table :data="songList" style="width: 100%"
                         :default-sort="{ prop: 'id', order: 'ascending' }" highlight-current-row
                         @row-click="handleRowClick">
                         <el-table-column prop="id" label="#" width="60" sortable align="center" fixed>
@@ -55,8 +55,8 @@
                                     <div class="song-details">
                                         <div class="song-title" style="font-weight: bolder; font-size: large;">{{ scope.row.name }}</div>
                                         <div class="song-meta">
-                                            <span class="singer">{{ scope.row.singer }}</span>
-                                            <span class="album">{{ scope.row.album }}</span>
+                                            <span class="singer">{{ scope.row.artistId }}</span>
+                                            <span class="album">{{ scope.row.musicUrl }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -108,14 +108,29 @@
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { useSongListStore } from '@/stores/songList'
+import { useSongMenuListStore } from '@/stores/songMenuList'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const songListStore = useSongListStore()
-const songList = songListStore.songList
+const songMenuListStore = useSongMenuListStore()
+const songMenuList = computed(() => songMenuListStore.songMenuList)
+const collectMenuList = computed(() => songMenuListStore.collectMenuList)
+
+const totalList = computed(() => [...collectMenuList.value, ...songMenuList.value])
+const totalListLength = computed(() => totalList.value.length)
 
 const songListId = route.params.id
 console.log('歌单ID:', songListId)
+const playListData = computed(() => totalList.value.find(item => item.id === songListId))
+console.log('歌单数据:', playListData.value)
+
+const songList = ref([])
+onMounted(async() => {
+    await songListStore.getAllSongList(songListId)
+    songList.value = songListStore.songList
+    console.log('歌单列表:', songList.value)
+})
 
 // tab 相关状态
 const activeTab = ref('1')

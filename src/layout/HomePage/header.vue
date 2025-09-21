@@ -17,9 +17,9 @@
             <div class="right">
                 <div class="header-user_bucket" @click="handleLogin">
                     <div class="user_logo">
-                        <img :src="user.avatar" alt="用户图片" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        <img :src="user.avatarUrl" alt="用户图片" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                     </div>
-                    <div class="user_name">{{user.name}}</div>
+                    <div class="user_name">{{user.username}}</div>
                     <div class="iconfont icon-down"></div>
                 </div>
                 <div class="header-user_function">
@@ -33,12 +33,14 @@
 </template>
 
 <script setup>
+
 import { useUserStore } from '@/stores/user';
 import { useComponentStatusStore } from '@/stores/componentStatus';
+import { computed } from 'vue';
 const userStore = useUserStore();
 const componentStatusStore = useComponentStatusStore();
-const user = userStore.user;
-console.log(userStore.user);
+const user = computed(() => userStore.user);
+
 const handleLogin = () => {
     if(!userStore.isLogin){
         componentStatusStore.showLoginComponent();

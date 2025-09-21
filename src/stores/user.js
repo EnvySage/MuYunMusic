@@ -3,8 +3,11 @@ import avatar from '@/image/avatar.png'
 export const useUserStore = defineStore("user", {
   state: () => ({
     user: {
-        name: "未登录",
-        avatar: avatar,
+        id: "0",
+        username: "未登录",
+        nickname: "昵称",
+        avatarUrl: avatar,
+        token: "",
     },
     isLogin: false,
   }),
