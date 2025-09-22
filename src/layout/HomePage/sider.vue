@@ -65,7 +65,7 @@
           :icon="item.coverUrl" 
           :text="item.name" 
           :selected="selectedKey === `collected_${index}`" 
-          @click="handleItemClick(`collected_${index}`)" 
+          @click="handleItemClick(`collected_${index}`,item.id)" 
         />
       </div>
     </div>

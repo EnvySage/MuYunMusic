@@ -49,6 +49,7 @@ import { useComponentStatusStore } from '@/stores/componentStatus'
 import { useUserStore } from '@/stores/user'
 import request from '@/utils/http'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 const router = useRouter()
 const store = useComponentStatusStore()
 const userStore = useUserStore()
@@ -144,22 +145,26 @@ const handleSubmit = () => {
         // 执行登录逻辑
         console.log('登录:', loginForm.value)
         request.post('/user/login', loginForm.value).then((res) => {
-          console.log('登录成功:', res)
-          userStore.setUser({
-            id: res.data.id,
-            username: res.data.username,
-            nickname: res.data.nickname,
-            avatarUrl: res.data.avatarUrl,
-            token: res.data.token
-          })
-          localStorage.setItem("token",res.data.token)
-          store.hideLoginComponent()
-          location.reload()
-          ElMessage.success('登录成功')
-          
+          if(res.code==1){
+            console.log('登录成功:', res)
+            ElMessage.success('登录成功')
+            userStore.setUser({
+              id: res.data.id,
+              username: res.data.username,
+              nickname: res.data.nickname,
+              avatarUrl: res.data.avatarUrl,
+              token: res.data.token
+            })
+            localStorage.setItem("token",res.data.token)
+            store.hideLoginComponent()
+            location.reload()
+          }else{
+            console.log('登录失败:', res)
+            ElMessage.error(res.msg)
+          }
         }).catch((err) => {
           console.log('登录失败:', err)
-          // 登录失败后处理
+          ElMessage.error(err)
         })
       }
     })

@@ -32,83 +32,23 @@ http.interceptors.request.use(
 )
 
 // 响应拦截器
-// 响应拦截器
 http.interceptors.response.use(
   response => {
     const res = response.data
     
     // 根据业务状态码处理
     if (res.code !== 1) {
-      // 处理业务错误
-      ElMessage.error(res.message || 'Error')
-      
-      // 根据业务需要处理特定的业务错误码
+      console.log('业务错误:', res)
       if (res.code === 401 || res.code === 403) { // 假设401或403表示未授权
         const userStore = useUserStore()
         userStore.setLogin(false)
         router.push('/')
       }
-      
-      // 统一拒绝所有业务错误
-      return Promise.reject(new Error(res.message || 'Error'))
     }
     
     return res
-  },
-  error => {
-    // HTTP状态码错误处理
-    if (error.response) {
-      switch (error.response.status) {
-        case 400:
-          error.message = '请求错误'
-          break
-        case 401:
-          error.message = '未授权，请重新登录'
-          // 跳转登录页
-          const userStore = useUserStore()
-          userStore.setLogin(false)
-          router.push('/')
-          break
-        case 403:
-          error.message = '拒绝访问'
-          break
-        case 404:
-          error.message = `请求地址出错: ${error.response.config.url}`
-          break
-        case 408:
-          error.message = '请求超时'
-          break
-        case 500:
-          error.message = '服务器内部错误'
-          break
-        case 501:
-          error.message = '服务未实现'
-          break
-        case 502:
-          error.message = '网关错误'
-          break
-        case 503:
-          error.message = '服务不可用'
-          break
-        case 504:
-          error.message = '网关超时'
-          break
-        case 505:
-          error.message = 'HTTP版本不受支持'
-          break
-        default:
-          error.message = `连接错误${error.response.status}`
-      }
-    } else if (error.message.includes('timeout')) {
-      error.message = '请求超时'
-    } else if (error.message.includes('Network Error')) {
-      error.message = '网络连接错误'
-    }
-    
-    ElMessage.error(error.message)
-    return Promise.reject(error)
-  }
-)
+  })
+ 
 /**
  * 封装请求方法
  */

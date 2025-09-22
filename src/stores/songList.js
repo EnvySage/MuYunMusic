@@ -20,6 +20,8 @@ export const useSongListStore = defineStore("songList", {
       try {
         const res = await request.get(`/playlist/getById/${id}`);
         this.currentSongList = res.data;
+        this.songList = res.data;
+        console.log(res)
         return res.data;
       } catch (error) {
         console.error("获取歌单失败:", error);

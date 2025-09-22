@@ -9,9 +9,9 @@
                     <div class="title">{{ playListData.name }}</div>
                     <div class="subBox">
                         <div class="subImg">
-                            <img :src="songList.authorAvatar" alt="">
+                            <img :src="playlistUserData?.avatarUrl|| avatar" alt="">
                         </div>
-                        <div class="subText">{{ songList.author }} - {{ songList.date }}</div>
+                        <div class="subText">{{playlistUserData?.nickname || "未知用户"}} - {{ playListData?.createTime || "1145-14-13"}}</div>
                     </div>
                     <div class="desc">{{ songList.description }}</div>
                 </div>
@@ -50,13 +50,13 @@
                             <template #default="scope">
                                 <div class="song-info" style="display: flex; gap: 10px;">
                                     <div class="song-cover" style="width: 60px; height: 60px;">
-                                        <img :src="scope.row.icon" alt="专辑封面" style="width: 100%; height: 100%; object-fit: cover; border-radius: 5px;">
+                                        <img :src="scope.row.coverUrl" alt="专辑封面" style="width: 100%; height: 100%; object-fit: cover; border-radius: 5px;">
                                     </div>
                                     <div class="song-details">
                                         <div class="song-title" style="font-weight: bolder; font-size: large;">{{ scope.row.name }}</div>
-                                        <div class="song-meta">
-                                            <span class="singer">{{ scope.row.artistId }}</span>
-                                            <span class="album">{{ scope.row.musicUrl }}</span>
+                                        <div class="song-meta" style="display: flex; gap: 15px; color: gray">
+                                            <span class="singer" style="font-weight: bolder; font-size: larger;">{{ scope.row?.artistName || ""}}</span>
+                                            <span class="album">{{ scope.row.album }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -82,7 +82,7 @@
                         <el-table-column prop="duration" label="时长" width="80" align="center">
                             <template #default="scope">
                                 <div class="duration-cell">
-                                    {{ scope.row.duration }}
+                                    {{ formatDuration(scope.row.duration) }}
                                 </div>
                             </template>
                         </el-table-column>
@@ -106,42 +106,88 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useSongListStore } from '@/stores/songList'
 import { useSongMenuListStore } from '@/stores/songMenuList'
 import { useRoute } from 'vue-router'
+import { useMusicPlayerStore } from '@/stores/musicPlayer'
+import request from '@/utils/http'
+import avatar from '@/image/avatar.png'
 
 const route = useRoute()
 const songListStore = useSongListStore()
 const songMenuListStore = useSongMenuListStore()
 const songMenuList = computed(() => songMenuListStore.songMenuList)
 const collectMenuList = computed(() => songMenuListStore.collectMenuList)
-
+const musicPlayerStore = useMusicPlayerStore()
 const totalList = computed(() => [...collectMenuList.value, ...songMenuList.value])
-const totalListLength = computed(() => totalList.value.length)
 
-const songListId = route.params.id
-console.log('歌单ID:', songListId)
-const playListData = computed(() => totalList.value.find(item => item.id === songListId))
-console.log('歌单数据:', playListData.value)
+const songListId = ref(route.params.id)
+const playListData = computed(() => totalList.value.find(item => item.id === songListId.value))
 
 const songList = ref([])
-onMounted(async() => {
-    await songListStore.getAllSongList(songListId)
+const playlistUserData = ref()
+
+// 监听路由参数变化
+watch(
+  () => route.params.id,
+  (newId, oldId) => {
+    console.log('路由ID变化:', oldId, '->', newId)
+    if (newId && newId !== oldId) {
+      songListId.value = newId
+      loadData()
+    }
+  }
+)
+
+// 数据加载函数
+const loadData = async () => {
+  try {
+    console.log('开始加载数据，ID:', songListId.value)
+    
+    await songListStore.getAllSongList(songListId.value)
     songList.value = songListStore.songList
-    console.log('歌单列表:', songList.value)
+    console.log('歌曲列表加载完成:', songList.value)
+    
+    // 加载用户数据
+    const playlistData = totalList.value.find(item => item.id === songListId.value)
+    console.log('找到的歌单数据:', playlistData)
+    
+    if (playlistData && playlistData.userId) {
+      const res = await request.get(`/playlist/getUserById/${playlistData.userId}`)
+      playlistUserData.value = res.data
+      console.log('用户数据加载完成:', playlistUserData.value)
+    }
+  } catch (error) {
+    console.error('数据加载失败:', error)
+    songList.value = []
+    playlistUserData.value = null
+  }
+}
+
+// 初始化加载
+onMounted(() => {
+  loadData()
 })
+
+const formatDuration = (seconds) => {
+  if (!seconds || seconds <= 0) return '0:00'
+  
+  const minutes = Math.floor(seconds / 60)
+  const remainingSeconds = Math.floor(seconds % 60)
+  
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+}
 
 // tab 相关状态
 const activeTab = ref('1')
 
 // tab 数据
-const tabs = ref([
-    { index: '1', label: '歌曲', count: 50 },
+const tabs = computed(() => [
+    { index: '1', label: '歌曲', count: songList.value?.length || 0 },
     { index: '2', label: '评论', count: 128 },
     { index: '3', label: '收藏者', count: 256 }
 ])
-
 
 // 处理 tab 选择
 const handleTabSelect = (index) => {
@@ -150,14 +196,21 @@ const handleTabSelect = (index) => {
 
 // 处理行点击
 const handleRowClick = (row) => {
-  console.log('点击歌曲:', row)
-  // 这里可以添加播放逻辑
+  const song={
+    title: row.name,
+    artist: row.artistName,
+    url: row.musicUrl,
+    cover: row.coverUrl
+  }
+  const duration = row.duration
+  musicPlayerStore.setCurrentSong(song)
+  musicPlayerStore.setDuration(duration)
+  musicPlayerStore.setLyricText("https://muyun-music.oss-cn-shenzhen.aliyuncs.com/lyrics/Brave%20Shine%20-%20Aimer.lrc")
+  console.log('播放歌曲:', musicPlayerStore.currentSong)
 }
 
 // 处理喜欢/取消喜欢
 const handleLike = (row) => {
-  row.isLiked = !row.isLiked
-  console.log('喜欢状态:', row.isLiked)
 }
 </script>
 

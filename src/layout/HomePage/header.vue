@@ -2,7 +2,7 @@
     <div class="homeLayout">
         <div class="header">
             <div class="left">
-                <div class="header-logo iconfont icon-wangyiyunyinle1"></div>
+                <div class="header-logo iconfont icon-wangyiyunyinle1" @click="goToIndex"></div>
                 <div class="header-search">
                     <div class="search-back iconfont icon-down"></div>
                     <div class="search-input">
@@ -37,10 +37,14 @@
 import { useUserStore } from '@/stores/user';
 import { useComponentStatusStore } from '@/stores/componentStatus';
 import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 const userStore = useUserStore();
 const componentStatusStore = useComponentStatusStore();
 const user = computed(() => userStore.user);
-
+const router=useRouter();
+const goToIndex = () => {
+    router.push('/');
+}
 const handleLogin = () => {
     if(!userStore.isLogin){
         componentStatusStore.showLoginComponent();
