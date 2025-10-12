@@ -14,64 +14,66 @@ onMounted(() => {
 // LRC 歌词文本 (从store获取)
 const lrcText = computed(() => musicPlayerStore.lyricText)
 
-// 改進の歌词解析函数
 const parseLRC = (lrcText) => {
-  const lines = lrcText.split('\n');
+  const lines = lrcText.split('\n').filter(line => line.trim() !== '');
   const lyrics = [];
-  const timeRegex = /\[(\d+):(\d+)\.(\d+)\]/g;
-  
-  let currentTime = null;
-  let currentJapanese = '';
-  let currentChinese = '';
-  
-  lines.forEach(line => {
-    // 提取所有时间标签
-    const timeMatches = [...line.matchAll(timeRegex)];
-    
-    if (timeMatches.length > 0) {
-      // 如果有时间标签，计算时间（秒）
-      const match = timeMatches[0];
-      const minutes = parseInt(match[1]);
-      const seconds = parseInt(match[2]);
-      const milliseconds = parseInt(match[3]);
+
+  const timeRegex = /\[(\d+):(\d+)\.(\d+)\]/;
+
+  let buffer = []; // 用于暂存同一时间或相邻时间的歌词行
+
+  lines.forEach((rawLine, index) => {
+    const line = rawLine.trim();
+    if (!line) return;
+
+    const timeMatch = line.match(timeRegex);
+    let currentTime = null;
+    let text = line;
+
+    if (timeMatch) {
+      const minutes = parseInt(timeMatch[1]);
+      const seconds = parseInt(timeMatch[2]);
+      const milliseconds = parseInt(timeMatch[3]);
       currentTime = (minutes * 60) + seconds + (milliseconds / 1000);
-      
-      // 提取文本内容
-      const text = line.replace(timeRegex, '').trim();
-      
-      if (text) {
-        // 判断是日文还是中文
-        const isJapanese = /[\u3040-\u309F\u30A0-\u30FF\uFF65-\uFF9F]/.test(text);
-        
-        if (isJapanese) {
-          currentJapanese = text;
-        } else {
-          currentChinese = text;
-        }
-      }
-    } else if (line.trim()) {
-      // 没有时间标签の行作为歌词内容
-      const text = line.trim();
-      const isJapanese = /[\u3040-\u309F\u30A0-\u30FF\uFF65-\uFF9F]/.test(text);
-      
-      if (isJapanese) {
-        currentJapanese = text;
-      } else {
-        currentChinese = text;
-      }
+      text = line.replace(timeRegex, '').trim();
     }
-    
-    // 当同时有日文和中文时，添加到歌词列表
-    if (currentTime !== null && currentJapanese && currentChinese) {
-      lyrics.push({
-        time: currentTime + musicPlayerStore.lyricOffset,
-        originalTime: currentTime,
-        japanese: currentJapanese,
-        chinese: currentChinese
-      });
-      // 重置当前记录
-      currentJapanese = '';
-      currentChinese = '';
+
+    const isJapanese = text ? /[\u3040-\u309F\u30A0-\u30FF\uFF65-\uFF9F]/.test(text) : false;
+
+    const entry = {
+      time: currentTime,
+      text,
+      isJapanese,
+      raw: rawLine,
+      index
+    };
+
+    buffer.push(entry);
+
+    // 尝试配对：查找当前 buffer 中是否有可以配对的日文和中文
+    for (let i = 0; i < buffer.length - 1; i++) {
+      const first = buffer[i];
+      const second = buffer[i + 1];
+
+      // 两者都有时间，且时间相等或非常接近，且一个是日文，一个是中文
+      if (
+        first.time !== null &&
+        second.time !== null &&
+        Math.abs(first.time - second.time) < 0.1 && // 允许微小误差
+        first.isJapanese !== second.isJapanese && // 语言不同
+        first.text && second.text // 有实际文本
+      ) {
+        lyrics.push({
+          time: first.time + musicPlayerStore.lyricOffset, // 假设有 offset
+          originalTime: first.time,
+          japanese: first.isJapanese ? first.text : second.isJapanese ? second.text : '',
+          chinese: first.isJapanese ? second.text : second.isJapanese ? first.text : ''
+        });
+
+        // 移除已配对的条目
+        buffer.splice(i, 2);
+        break; // 一次只配对一对
+      }
     }
   });
 

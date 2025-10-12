@@ -114,8 +114,8 @@ const handlePlay = () => {
   right: 0;
   bottom: -80%;
   backdrop-filter: blur(30px);
-  -webkit-mask: linear-gradient(to top, black 60%, transparent);
-  mask: linear-gradient(to top, black 60%, transparent);
+  -webkit-mask: linear-gradient(to top, black 70%, transparent);
+  mask: linear-gradient(to top, black 70%, transparent);
   color: var(--text-color-white);
   padding: 16px;
   z-index: 3;

@@ -4,7 +4,7 @@
             <div class="left">
                 <div class="header-logo iconfont icon-wangyiyunyinle1" @click="goToIndex"></div>
                 <div class="header-search">
-                    <div class="search-back iconfont icon-down"></div>
+                    <div class="search-back iconfont icon-down" @click="backPreview"></div>
                     <div class="search-input">
                         <div class="iconfont icon-sousuosearch"></div>
                         <input type="text" placeholder="搜索音乐、歌单、专辑" />
@@ -49,6 +49,9 @@ const handleLogin = () => {
     if(!userStore.isLogin){
         componentStatusStore.showLoginComponent();
     }
+}
+const backPreview = () => {
+    router.back();
 }
 </script>
 

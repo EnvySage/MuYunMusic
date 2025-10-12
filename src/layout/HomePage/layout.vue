@@ -19,7 +19,7 @@
           </div>
         </template>
         <div class="playList">
-          <playListItem></playListItem>
+          <playListItem @click="handleListPlay(playerItem)" v-for="playerItem in playerList" :img="playerItem.coverUrl" :title="playerItem.name" :artist="playerItem.artistName" :duration="playerItem.duration" ></playListItem>
         </div>
       </el-drawer>
     </div>
@@ -39,7 +39,7 @@
     <div class="LyricBox" v-else-if="lyricStore.lyricPage">
       <Lyric></Lyric>
     </div>
-    <div class="footer">
+    <div class="footer" v-show="musicPlayerStore.currentSong.title !== '未选择歌曲'">
       <Footer></Footer>
     </div>
     <!-- 添加全局音频元素 -->
@@ -50,7 +50,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted,computed } from 'vue'
 import { useLyricStore } from '@/stores/lyric'
 import { useMusicPlayerStore } from '@/stores/musicPlayer'
 import { usePlayerStore } from '@/stores/playerList';
@@ -69,13 +69,29 @@ onMounted(() => {
   if (audioElement.value) {
     musicPlayerStore.setAudioElement(audioElement.value)
     // 初始化歌曲信息
-    musicPlayerStore.setCurrentSong({
-      title: '晚餐歌',
-      artist: 'tuki.',
-      url: music,
-      cover: albumCover
-    })
+    // musicPlayerStore.setCurrentSong({
+    //   title: '晚餐歌',
+    //   artist: 'tuki.',
+    //   url: music,
+    //   cover: albumCover
+    // })
   }
+})
+const handleListPlay = (item) => {
+  const song = {
+    title: item.name,
+    artist: item.artistName,
+    url: item.musicUrl,
+    cover: item.coverUrl
+  }
+  const duration = item.duration
+  musicPlayerStore.setCurrentSong(song)
+  musicPlayerStore.setDuration(duration)
+  musicPlayerStore.setLyricText(item.id)
+}
+
+const playerList = computed(() => {
+  return playerStore.getPlayerList()
 })
 
 const handleTimeUpdate = () => {
@@ -95,8 +111,21 @@ const handlePause = () => {
 }
 
 const handleEnded = () => {
-  musicPlayerStore.setPlayingState(false)
   musicPlayerStore.setCurrentTime(0)
+  // 先获取下一首歌曲
+  const nextSong = playerStore.nextSong()
+  
+  // 如果有下一首歌曲，则播放它
+  if (nextSong && musicPlayerStore.audioElement) {
+    // 重置播放状态
+    musicPlayerStore.setPlayingState(false)
+    setTimeout(() => {
+      musicPlayerStore.togglePlay()
+    }, 100)
+  } else {
+
+    musicPlayerStore.setPlayingState(false)
+  }
 }
 
 // 导入音乐和专辑封面

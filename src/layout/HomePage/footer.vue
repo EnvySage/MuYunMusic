@@ -28,12 +28,12 @@
         <div class="audioControllContainer">
             <div class="audioControl" :style="{ 'filter': lyricStore.lyricPage ? 'invert(100%)' : 'invert(0%)' }">
                 <div class="iconfont icon-dianzan-xiankuang"></div>
-                <div class="iconfont icon-shangyiji"></div>
+                <div class="iconfont icon-shangyiji" @click="switchplayer(0)"></div>
                 <div class="iconfont" :class="musicPlayerStore.isPlaying ? 'icon-zanting1' : 'icon-bofang1'"
                     style="padding: 5px; background-color: red; border-radius: 50%; color: white;" @click="togglePlay"
                     :style="{ 'filter': lyricStore.lyricPage ? 'invert(100%)' : 'invert(0%)' }">
                 </div>
-                <div class="iconfont icon-xiayiji"></div>
+                <div class="iconfont icon-xiayiji" @click="switchplayer(1)"></div>
                 <div class="iconfont icon-suijibofang"></div>
             </div>
             <div class="audioProgress" v-if="!lyricStore.lyricPage">
@@ -75,6 +75,15 @@ const volumeValue = ref(musicPlayerStore.volume * 100)
 const volumeIcon = ref(null)
 const volumePanel = ref(null)
 
+
+const switchplayer = (upAnddown) => {
+    if (upAnddown === 0) {
+        playerStore.prevSong()
+    } else {
+        playerStore.nextSong()
+    }
+    console.log('切换歌曲' + playerStore.currentSongIndex)
+}
 // 切换音量面板显示
 const toggleVolumePanel = (event) => {
     event.stopPropagation()
@@ -129,7 +138,6 @@ const formattedDuration = computed(() => formatTime(musicPlayerStore.duration))
 const isDragging = ref(false)
 const dragValue = ref(0)
 
-// 修复进度条在页面切换后无法使用的问题
 const progressValue = computed({
     get: () => {
         // 添加边界检查
@@ -141,22 +149,11 @@ const progressValue = computed({
         return isNaN(percent) ? 0 : Math.min(100, Math.max(0, Math.round(percent * 10) / 10)) // 限制在0-100范围内
     },
     set: (value) => {
-        if (isDragging.value) {
-            dragValue.value = value
-            return
-        }
-
-        // 添加音频元素存在性检查
-        if (musicPlayerStore.audioElement && musicPlayerStore.duration > 0) {
-            const seekTime = (value / 100) * musicPlayerStore.duration
-            // 只有当变化超过 0.1 秒时才更新
-            if (Math.abs(seekTime - musicPlayerStore.currentTime) > 0.1) {
-                musicPlayerStore.audioElement.currentTime = seekTime
-            }
-        }
+        // 不再在 set 中直接更新音频时间，只在拖动结束时更新
+        isDragging.value = true
+        dragValue.value = value
     }
 })
-
 // 播放/暂停切换
 const togglePlay = () => {
     musicPlayerStore.togglePlay()
@@ -177,7 +174,6 @@ const onProgressChange = (value) => {
         musicPlayerStore.audioElement.currentTime = seekTime
     }
 }
-
 // 监听音频元素变化，确保进度条正常工作
 watch(() => musicPlayerStore.audioElement, (newAudioElement) => {
     if (newAudioElement) {
@@ -254,6 +250,8 @@ watch(() => musicPlayerStore.audioElement, (newAudioElement) => {
         display: flex;
         gap: var(--spacing-md);
         align-items: center;
+        width: 400px;
+        flex-wrap: nowrap;
 
         img {
             width: 60px;
@@ -290,11 +288,24 @@ watch(() => musicPlayerStore.audioElement, (newAudioElement) => {
                 .albumName {
                     color: var(--text-color-light);
                     font-weight: var(--font-weight-bold);
+                    white-space: nowrap;
+                    /* 不换行 */
+                    overflow: hidden;
+                    /* 隐藏溢出内容 */
+                    text-overflow: ellipsis;
+                    /* 显示省略号 */
+                    max-width: 200px;
+                    /* 可根据实际宽度调整 */
                 }
 
                 .albumAuthor {
                     color: var(--text-color-lighter);
                     font-weight: var(--font-weight-light);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    max-width: 100px;
+                    /* 控制作者名长度 */
                 }
             }
 
@@ -393,7 +404,8 @@ watch(() => musicPlayerStore.audioElement, (newAudioElement) => {
         display: flex;
         align-items: center;
         position: relative;
-        .controlVolume { 
+
+        .controlVolume {
             display: flex;
             gap: var(--spacing-md);
             flex-direction: column;
@@ -420,6 +432,7 @@ watch(() => musicPlayerStore.audioElement, (newAudioElement) => {
         }
 
     }
+
     // 音量控制面板样式
     .volume-panel {
         position: absolute;

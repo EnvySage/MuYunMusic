@@ -20,97 +20,15 @@
         <div class="recommendSongSpecial">
             <div class="CardList-title">精选推荐</div>
             <div class="CardList">
-                <song-menu-card CardTitle="每日推荐" :bg-image=Card1 song-title="断捨離 (feat. りりあ。)" song-artist="来自日推"
-                    :tracks="[
-                        { name: 'おしんこ' },
-                        { name: '雪の降らない星' },
-                        { name: 'すずめ feat.十明' }
-                    ]" :show-play-button="true" @play="handlePlay"></song-menu-card>
-                <song-menu-card CardTitle="每日推荐" :bg-image=Card1 song-title="断捨離 (feat. りりあ。)" song-artist="来自日推"
-                    :tracks="[
-                        { name: 'おしんこ' },
-                        { name: '雪の降らない星' },
-                        { name: 'すずめ feat.十明' }
-                    ]" :show-play-button="true" @play="handlePlay"></song-menu-card>
-                <song-menu-card CardTitle="每日推荐" :bg-image=Card1 song-title="断捨離 (feat. りりあ。)" song-artist="来自日推"
-                    :tracks="[
-                        { name: 'おしんこ' },
-                        { name: '雪の降らない星' },
-                        { name: 'すずめ feat.十明' }
-                    ]" :show-play-button="true" @play="handlePlay"></song-menu-card>
-                <song-menu-card CardTitle="每日推荐" :bg-image=Card1 song-title="断捨離 (feat. りりあ。)" song-artist="来自日推"
-                    :tracks="[
-                        { name: 'おしんこ' },
-                        { name: '雪の降らない星' },
-                        { name: 'すずめ feat.十明' }
-                    ]" :show-play-button="true" @play="handlePlay"></song-menu-card>
-                <song-menu-card CardTitle="每日推荐" :bg-image=Card1 song-title="断捨離 (feat. りりあ。)" song-artist="来自日推"
-                    :tracks="[
-                        { name: 'おしんこ' },
-                        { name: '雪の降らない星' },
-                        { name: 'すずめ feat.十明' }
-                    ]" :show-play-button="true" @play="handlePlay"></song-menu-card>
-                <song-menu-card CardTitle="每日推荐" :bg-image=Card1 song-title="断捨離 (feat. りりあ。)" song-artist="来自日推"
-                    :tracks="[
-                        { name: 'おしんこ' },
-                        { name: '雪の降らない星' },
-                        { name: 'すずめ feat.十明' }
-                    ]" :show-play-button="true" @play="handlePlay"></song-menu-card>
-                <song-menu-card CardTitle="每日推荐" :bg-image=Card1 song-title="断捨離 (feat. りりあ。)" song-artist="来自日推"
-                    :tracks="[
-                        { name: 'おしんこ' },
-                        { name: '雪の降らない星' },
-                        { name: 'すずめ feat.十明' }
-                    ]" :show-play-button="true" @play="handlePlay"></song-menu-card>
-
+                <song-menu-card v-for="songListItem in songCardList1" :CardTitle="songListItem.name" :bg-image=songListItem.coverUrl :song-title="songListItem.description" song-artist="来自官方"
+                    :tracks="songListItem.tracks" :show-play-button="true" @click="navigatoPlaylist(songListItem.id)"></song-menu-card>
             </div>
         </div>
         <div class="recommendSongSpecial">
             <div class="CardList-title">推荐歌单</div>
             <div class="CardList">
-                <song-menu-card CardTitle="每日推荐" :bg-image=Card1 song-title="断捨離 (feat. りりあ。)" song-artist="来自日推"
-                    :tracks="[
-                        { name: 'おしんこ' },
-                        { name: '雪の降らない星' },
-                        { name: 'すずめ feat.十明' }
-                    ]" :show-play-button="true" @play="handlePlay"></song-menu-card>
-                <song-menu-card CardTitle="每日推荐" :bg-image=Card1 song-title="断捨離 (feat. りりあ。)" song-artist="来自日推"
-                    :tracks="[
-                        { name: 'おしんこ' },
-                        { name: '雪の降らない星' },
-                        { name: 'すずめ feat.十明' }
-                    ]" :show-play-button="true" @play="handlePlay"></song-menu-card>
-                <song-menu-card CardTitle="每日推荐" :bg-image=Card1 song-title="断捨離 (feat. りりあ。)" song-artist="来自日推"
-                    :tracks="[
-                        { name: 'おしんこ' },
-                        { name: '雪の降らない星' },
-                        { name: 'すずめ feat.十明' }
-                    ]" :show-play-button="true" @play="handlePlay"></song-menu-card>
-                <song-menu-card CardTitle="每日推荐" :bg-image=Card1 song-title="断捨離 (feat. りりあ。)" song-artist="来自日推"
-                    :tracks="[
-                        { name: 'おしんこ' },
-                        { name: '雪の降らない星' },
-                        { name: 'すずめ feat.十明' }
-                    ]" :show-play-button="true" @play="handlePlay"></song-menu-card>
-                <song-menu-card CardTitle="每日推荐" :bg-image=Card1 song-title="断捨離 (feat. りりあ。)" song-artist="来自日推"
-                    :tracks="[
-                        { name: 'おしんこ' },
-                        { name: '雪の降らない星' },
-                        { name: 'すずめ feat.十明' }
-                    ]" :show-play-button="true" @play="handlePlay"></song-menu-card>
-                <song-menu-card CardTitle="每日推荐" :bg-image=Card1 song-title="断捨離 (feat. りりあ。)" song-artist="来自日推"
-                    :tracks="[
-                        { name: 'おしんこ' },
-                        { name: '雪の降らない星' },
-                        { name: 'すずめ feat.十明' }
-                    ]" :show-play-button="true" @play="handlePlay"></song-menu-card>
-                <song-menu-card CardTitle="每日推荐" :bg-image=Card1 song-title="断捨離 (feat. りりあ。)" song-artist="来自日推"
-                    :tracks="[
-                        { name: 'おしんこ' },
-                        { name: '雪の降らない星' },
-                        { name: 'すずめ feat.十明' }
-                    ]" :show-play-button="true" @play="handlePlay"></song-menu-card>
-
+                <song-menu-card v-for="songListItem in songCardList2" :CardTitle="songListItem.name" :bg-image=songListItem.coverUrl :song-title="songListItem.description" song-artist="来自官方"
+                    :tracks="songListItem.tracks" :show-play-button="true" @click="navigatoPlaylist(songListItem.id)"></song-menu-card>
             </div>
         </div>
         <div class="rankList">
@@ -130,11 +48,35 @@ import pic2 from '@/image/Carousel/pic2.png'
 import pic3 from '@/image/Carousel/pic3.png'
 import pic4 from '@/image/Carousel/pic4.png'
 import pic5 from '@/image/Carousel/pic5.png'
-import Card1 from '@/image/SongMenuImg/Card1.jpg'
 import RecommendCard from '@/components/recommendCard.vue'
 import SongMenuCard from '@/components/songMenuCard.vue'
 import rankList from '@/components/rankList.vue'
 import avatar from '@/image/avatar.png'
+import { useAdminPlaylistStore } from '@/stores/AdminPlaylist'
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
+const router = useRouter()
+const adminPlaylistStore = useAdminPlaylistStore();
+const songCardData = computed(() => {
+    return [...adminPlaylistStore.adminPlaylist1];
+});
+const songCardList1 = computed(() => {
+    return songCardData.value.slice(0, 6);
+});
+const songCardList2 = computed(() => {
+    return songCardData.value.slice(6, 14);
+});
+const navigatoPlaylist = (id) => {
+  if (id !== undefined && id !== null) {
+    console.log('跳转到歌单ID:', id);
+    router.push({
+      name: 'songList',
+      params: {
+        id: id,
+      },
+    });
+  }
+}
 const carouselData = [
     pic1,
     pic2,

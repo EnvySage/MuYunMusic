@@ -1,16 +1,20 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted,ref } from 'vue';
 import request from './utils/http';
 import { ElMessage } from 'element-plus';
 import { useUserStore } from '@/stores/user'
 import { useSongMenuListStore } from './stores/songMenuList';
 import { useSongListStore } from './stores/songList';
+import { useAdminPlaylistStore } from './stores/AdminPlaylist';
+const adminPlaylistStore = useAdminPlaylistStore()
 const songListStore = useSongListStore()
 const userStore = useUserStore()
 const songMenuListStore = useSongMenuListStore()
+const initializing = ref(true)
 onMounted(async()=>{
   await verifytoken()
-  await initSongMenuList()
+  await initList()
+   initializing.value = false
 })
 const verifytoken = async()=>{
   const token = localStorage.getItem('token')
@@ -38,17 +42,44 @@ const verifytoken = async()=>{
     localStorage.removeItem('token')
   }
 }
-const initSongMenuList = async()=>{ 
-  await songMenuListStore.getAllSongMenuList()
-  await songMenuListStore.getAllCollectMenuList()
-
+const initList = async()=>{ 
+  console.log('开始初始化数据...')
+  try {
+    console.log('开始获取歌单列表...')
+    await songMenuListStore.getAllSongMenuList()
+    console.log('歌单列表获取完成')
+    
+    console.log('开始获取收藏列表...')
+    await songMenuListStore.getAllCollectMenuList()
+    console.log('收藏列表获取完成')
+    
+    console.log('开始获取管理员播放列表1...')
+    await adminPlaylistStore.getAdminPlaylistF(1)
+    console.log('管理员播放列表1获取完成')
+    
+    console.log('开始获取管理员播放列表2...')
+    await adminPlaylistStore.getAdminPlaylistF(2)
+    console.log('管理员播放列表2获取完成')
+    
+    console.log('所有数据初始化完成')
+  } catch (error) {
+    console.error('初始化过程中发生错误:', error)
+  } finally {
+    initializing.value = false
+  }
 }
 </script>
 
 <template>
   <div class="app">
-
-    <router-view></router-view>
+    <!-- 添加加载状态显示 -->
+    <div v-if="initializing" class="loading-container">
+      <div class="loading-spinner">加载中...</div>
+    </div>
+    <!-- 初始化完成后渲染主内容 -->
+    <div v-else class="main-content">
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 

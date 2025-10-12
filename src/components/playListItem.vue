@@ -1,19 +1,19 @@
 <template>
     <div class="ItemBox" @mouseover="handleMouseOver" @mouseout="handleMouseOut">
         <div class="iconItem">
-            <img :src="playList[0].cover" alt="">
+            <img :src="img" alt="">
         </div>
         <div class="textItem">
-            <div class="textItem-title">{{ playList[0].title }}</div>
+            <div class="textItem-title">{{ title }}</div>
             <div class="textItem-subTitle">
                 <div class="power">
                     <i class="iconfont icon-VIP"></i>
                     <i class="iconfont icon-MV"></i>
                 </div>
-                <div class="textItem-subTitle-text">{{ playList[0].artist }}</div>
+                <div class="textItem-subTitle-text">{{ artist }}</div>
             </div>
         </div>
-        <div class="duration" v-if="!isHover">{{ playList[0].duration }}</div>
+        <div class="duration" v-if="!isHover">{{ formatDuration(duration) }}</div>
         <div class="functionIcon" v-else>
             <div class="iconfont icon-weixihuan" style="font-size: 30px;" @click="handleLove"></div>
             <div class="iconfont icon-shoucang1" style="font-size: 28px;"></div>
@@ -24,9 +24,22 @@
 
 <script setup>
 import { ref } from 'vue';
-import { usePlayListStore } from '@/stores/playListStore';
-const playlistStore = usePlayListStore();
-const playList = playlistStore.list;
+import { defineProps } from 'vue';
+const props = defineProps({
+  img: String,
+  title: String,
+  artist: String,
+  duration: Number,
+});
+
+const formatDuration = (seconds) => {
+  if (!seconds || seconds <= 0) return '0:00'
+  
+  const minutes = Math.floor(seconds / 60)
+  const remainingSeconds = Math.floor(seconds % 60)
+  
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+}
 const isHover = ref(false);
 const handleMouseOver = () => {
   isHover.value = true;

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import request from '@/utils/http'
 export const useMusicPlayerStore = defineStore('musicPlayer', () => {
   // 播放状态
   const isPlaying = ref(false)
@@ -18,10 +19,11 @@ export const useMusicPlayerStore = defineStore('musicPlayer', () => {
   
   // 歌曲信息
   const currentSong = ref({
-    title: '晚餐歌',
-    artist: 'tuki.',
+    title: '未选择歌曲',
+    artist: '',
     url: '',
-    cover: ''
+    cover: '',
+    id:""
   })
   
   // 歌词文本
@@ -30,6 +32,7 @@ export const useMusicPlayerStore = defineStore('musicPlayer', () => {
   // 歌词偏移量
   const lyricOffset = ref(0)
   
+// ... existing code ...
   // 播放/暂停切换
   const togglePlay = () => {
     if (!audioElement.value) return
@@ -37,10 +40,18 @@ export const useMusicPlayerStore = defineStore('musicPlayer', () => {
     if (isPlaying.value) {
       audioElement.value.pause()
     } else {
-      audioElement.value.play()
+      audioElement.value.play().catch(e => {
+        console.log("播放失败:", e);
+        // 如果是由于没有加载完成导致的错误，尝试重新加载
+        if (e.name === 'AbortError' || e.name === 'NotAllowedError') {
+          audioElement.value.load();
+          setTimeout(() => {
+            audioElement.value.play().catch(e => console.log("重试播放失败:", e));
+          }, 100);
+        }
+      })
     }
   }
-  
   // 设置音频元素
   const setAudioElement = (element) => {
     audioElement.value = element
@@ -53,7 +64,9 @@ export const useMusicPlayerStore = defineStore('musicPlayer', () => {
   
   // 设置当前时间
   const setCurrentTime = (time) => {
-    currentTime.value = time
+   if (Math.abs(currentTime.value - time) > 0.1) {
+      currentTime.value = time
+    }
   }
   
   // 设置总时长
@@ -61,15 +74,57 @@ export const useMusicPlayerStore = defineStore('musicPlayer', () => {
     duration.value = time
   }
   
+
   // 设置当前歌曲
   const setCurrentSong = (song) => {
-    currentSong.value = song
+    const wasPlaying = isPlaying.value && audioElement.value;
+    
+    // 如果正在播放，先暂停
+    if (wasPlaying) {
+      audioElement.value.pause();
+    }
+    
+    currentSong.value = song;
+    
+    // 等待 DOM 更新后重新开始播放
+    setTimeout(() => {
+      if (wasPlaying && audioElement.value) {
+        setPlayingState(false);
+        setCurrentTime(0);
+        audioElement.value.load();
+        // 等待音频加载完成后再播放
+        const playWhenReady = () => {
+          if (audioElement.value.readyState >= 2) {
+            audioElement.value.play().catch(e => {
+              console.log("播放失败:", e);
+              // 如果播放失败，稍后重试
+              setTimeout(() => {
+                if (isPlaying.value && audioElement.value) {
+                  audioElement.value.play().catch(e => console.log("重试播放失败:", e));
+                }
+              }, 500);
+            });
+          } else {
+            setTimeout(playWhenReady, 50);
+          }
+        };
+        playWhenReady();
+      }
+    }, 0);
+  }
+
+  // 设置歌词文本
+  const setLyricText =async (id) => {
+    try {
+    const response = await request.get(`/song/lyric/${id}`)
+    lyricText.value = response.data
+  } catch (error) {
+    console.error("获取歌词失败:", error)
+    lyricText.value = '' // 失败时设置为空字符串
+    return ''
+  }
   }
   
-  // 设置歌词文本
-  const setLyricText = (text) => {
-    lyricText.value = text
-  }
   
   // 调整歌词偏移量
   const adjustLyricOffset = (delta) => {
