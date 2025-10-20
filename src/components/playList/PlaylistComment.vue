@@ -42,7 +42,14 @@
     <!-- 评论列表区域 -->
     <div class="comment-list">
       <div class="CommentTitle">精彩评论</div>
-      <CommentItem v-for="CommentItem in commentStore.commentList" :commentItem="CommentItem" />
+      <div v-if="commentStore.commentList.length > 0">
+        <CommentItem v-for="CommentItem in commentStore.commentList" :commentItem="CommentItem" />
+      </div>
+      <div v-else>
+        <div class="NOComment" style="text-align: center; padding: 80px; color: #888;">
+          暂无评论，快来抢沙发吧~
+        </div>
+      </div>
     </div>
   </div>
 </template>

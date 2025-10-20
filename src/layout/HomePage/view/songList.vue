@@ -18,7 +18,7 @@
                 </div>
                 <div class="functionBox">
                     <div class="playButton" @click="handlePlayAll()">播放全部</div>
-                    <div class="downloadButton">下载</div>
+                    <div class="collectButton" @click="handleCollect()">收藏</div>
                 </div>
             </div>
         </div>
@@ -67,6 +67,7 @@ import avatar from '@/image/avatar.png'
 import { usePlayerStore } from '@/stores/playerList'
 import { useAdminPlaylistStore } from '@/stores/AdminPlaylist'
 import { useCommentStore } from '@/stores/commentStores'
+
 const commentStore = useCommentStore()
 const adminPlaylistStore = useAdminPlaylistStore()
 const playerStore = usePlayerStore()
@@ -267,7 +268,7 @@ const handleLike = (row) => {
                 gap: 10px;
 
                 .playButton,
-                .downloadButton {
+                .collectButton {
                     padding: 20px;
                     height: 40px;
                     border-radius: var(--border-radius-sm);
@@ -278,7 +279,7 @@ const handleLike = (row) => {
                     align-items: center;
                 }
 
-                .downloadButton {
+                .collectButton {
                     background-color: var(--button-color);
                     color: var(--text-color-white);
                 }

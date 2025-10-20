@@ -17,9 +17,10 @@ http.interceptors.request.use(
     config => {
     // 从Pinia store获取token
     const userStore = useUserStore()
-    if (userStore.token) {
+    if (userStore.user.token) {
       config.headers.Authorization = `Bearer ${userStore.user.token}`
     }
+    console.log('请求头:', config.headers)
     
     // 可以在这里添加其他请求前处理逻辑
      const fullUrl = http.getUri(config)
