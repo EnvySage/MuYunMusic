@@ -200,11 +200,12 @@ watch(() => musicPlayerStore.audioElement, (newAudioElement) => {
     justify-content: space-between;
     align-items: center;
     box-sizing: border-box;
-    padding: 20px 40px;
-    border-top: 1px solid var(--color-border);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    padding: var(--spacing-md) var(--spacing-xl);
+    border-top: 1px solid var(--border-color);
+    background: var(--background-color-white);
+    box-shadow: var(--shadow-md);
     position: relative;
-    backdrop-filter: blur(10px);
+    z-index: var(--z-index-fixed);
 
     .audioProgressShow {
         position: fixed;
@@ -217,8 +218,8 @@ watch(() => musicPlayerStore.audioElement, (newAudioElement) => {
         width: 100%;
 
         :deep(.el-slider) {
-            --el-slider-main-bg-color: red;
-            --el-slider-runway-bg-color: #ddd;
+            --el-slider-main-bg-color: var(--primary-color);
+            --el-slider-runway-bg-color: var(--border-color);
 
             .el-slider__runway {
                 height: 8px;
@@ -260,14 +261,20 @@ watch(() => musicPlayerStore.audioElement, (newAudioElement) => {
         flex-wrap: nowrap;
 
         img {
-            width: 60px;
-            height: 60px;
+            width: 56px;
+            height: 56px;
             object-fit: cover;
-            border-radius: 50%;
-            box-shadow: 0 0 0 10px black;
+            border-radius: var(--border-radius-round);
+            box-shadow: var(--shadow-sm);
             cursor: pointer;
+            transition: var(--transition-all);
             animation: rotateAlbum 20s linear infinite;
             animation-play-state: var(--album-rotation-state, paused);
+
+            &:hover {
+                box-shadow: var(--shadow-md);
+                transform: scale(1.05);
+            }
         }
 
         @keyframes rotateAlbum {
@@ -287,31 +294,28 @@ watch(() => musicPlayerStore.audioElement, (newAudioElement) => {
 
             .albumInfo {
                 display: flex;
-                font-size: var(--font-size-xl);
+                font-size: var(--font-size-sm);
                 gap: var(--spacing-xs);
                 align-items: center;
 
                 .albumName {
-                    color: var(--text-color-light);
-                    font-weight: var(--font-weight-bold);
+                    color: var(--text-color);
+                    font-weight: var(--font-weight-normal);
+                    font-size: var(--font-size-sm);
                     white-space: nowrap;
-                    /* 不换行 */
                     overflow: hidden;
-                    /* 隐藏溢出内容 */
                     text-overflow: ellipsis;
-                    /* 显示省略号 */
                     max-width: 200px;
-                    /* 可根据实际宽度调整 */
                 }
 
                 .albumAuthor {
                     color: var(--text-color-lighter);
-                    font-weight: var(--font-weight-light);
+                    font-weight: var(--font-weight-normal);
+                    font-size: var(--font-size-xs);
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
                     max-width: 100px;
-                    /* 控制作者名长度 */
                 }
             }
 
@@ -321,13 +325,23 @@ watch(() => musicPlayerStore.audioElement, (newAudioElement) => {
                 align-items: center;
 
                 .iconfont {
-                    font-size: var(--font-size-xl);
-                    filter: invert(50%);
+                    font-size: var(--icon-size-md);
+                    color: var(--text-color-light);
                     cursor: pointer;
+                    transition: var(--transition-all);
+                    padding: var(--spacing-xs);
+                    border-radius: var(--border-radius-sm);
+
+                    &:hover {
+                        color: var(--text-color);
+                        background-color: var(--background-color-sider-hover);
+                    }
                 }
 
-                .iconfont:hover {
-                    filter: invert(0);
+                .time-text {
+                    font-size: var(--font-size-xs);
+                    color: var(--text-color-lighter);
+                    white-space: nowrap;
                 }
             }
         }
@@ -346,17 +360,33 @@ watch(() => musicPlayerStore.audioElement, (newAudioElement) => {
             gap: var(--spacing-lg);
 
             .iconfont {
-                font-size: var(--font-size-xl);
-                transition: all 0.3s ease;
+                font-size: var(--icon-size-lg);
+                color: var(--text-color);
+                transition: var(--transition-all);
                 cursor: pointer;
-            }
+                padding: var(--spacing-xs);
+                border-radius: var(--border-radius-sm);
 
-            .iconfont:not(:nth-child(3)):hover {
-                filter: invert(50%);
-            }
+                &:not(:nth-child(3)):hover {
+                    color: var(--primary-color);
+                    background-color: var(--background-color-sider-hover);
+                }
 
-            .iconfont:nth-child(3):hover {
-                transform: scale(1.1);
+                &:nth-child(3) {
+                    color: var(--text-color-white);
+                    background-color: var(--primary-color);
+                    border-radius: var(--border-radius-round);
+                    width: 36px;
+                    height: 36px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    &:hover {
+                        background-color: var(--primary-color-hover);
+                        transform: scale(1.1);
+                    }
+                }
             }
         }
 
@@ -367,8 +397,8 @@ watch(() => musicPlayerStore.audioElement, (newAudioElement) => {
             width: 100%;
 
             :deep(.el-slider) {
-                --el-slider-main-bg-color: red;
-                --el-slider-runway-bg-color: #ddd;
+                --el-slider-main-bg-color: var(--primary-color);
+                --el-slider-runway-bg-color: var(--border-color);
                 width: 80%;
 
                 .el-slider__runway {
@@ -400,8 +430,10 @@ watch(() => musicPlayerStore.audioElement, (newAudioElement) => {
 
             .time-text {
                 display: flex;
-                font-size: 12px;
-                color: #666;
+                font-size: var(--font-size-xs);
+                color: var(--text-color-lighter);
+                white-space: nowrap;
+                min-width: 80px;
             }
         }
     }
@@ -426,14 +458,17 @@ watch(() => musicPlayerStore.audioElement, (newAudioElement) => {
             gap: var(--spacing-md);
 
             .iconfont {
-                font-size: var(--font-size-xl);
-                filter: invert(50%);
-                transition: all 0.3s ease;
+                font-size: var(--icon-size-lg);
+                color: var(--text-color-light);
+                transition: var(--transition-all);
                 cursor: pointer;
-            }
+                padding: var(--spacing-xs);
+                border-radius: var(--border-radius-sm);
 
-            .iconfont:hover {
-                filter: invert(0);
+                &:hover {
+                    color: var(--text-color);
+                    background-color: var(--background-color-sider-hover);
+                }
             }
         }
 
@@ -442,17 +477,18 @@ watch(() => musicPlayerStore.audioElement, (newAudioElement) => {
     // 音量控制面板样式
     .volume-panel {
         position: absolute;
-        bottom: 30px;
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 10px;
-        padding: 15px 1px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        bottom: 40px;
+        background: var(--background-color-white);
+        border-radius: var(--border-radius-lg);
+        padding: var(--spacing-md) var(--spacing-xs);
+        box-shadow: var(--shadow-lg);
         backdrop-filter: blur(10px);
-        z-index: 1000;
+        z-index: var(--z-index-popover);
+        border: 1px solid var(--border-color);
 
         :deep(.el-slider) {
-            --el-slider-main-bg-color: red;
-            --el-slider-runway-bg-color: #ddd;
+            --el-slider-main-bg-color: var(--primary-color);
+            --el-slider-runway-bg-color: var(--border-color);
 
             .el-slider__runway {
                 width: 6px;

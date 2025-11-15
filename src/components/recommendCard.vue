@@ -41,25 +41,26 @@ const handleClick = () => {
 
 <style scoped>
 .recommend-card {
-    position: relative;
+  position: relative;
   width: 100%;
-    height: 140px;
-  border-radius: 8px;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--border-radius-lg);
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-all);
   cursor: pointer;
+  background: var(--background-color-white);
   
   &:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
   }
 }
 
 .card-image {
   position: relative;
   width: 100%;
-  height: 160px;
+  height: 100%;
   overflow: hidden;
   
   img {

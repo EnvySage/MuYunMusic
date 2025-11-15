@@ -194,96 +194,127 @@ const toggleCollectedMenu = () => {
 .container {
   display: flex;
   flex-direction: column;
-  min-height: 1000px;
-  background-color: var(--background-color);
-  padding: 10px;  
+  min-height: 100vh;
+  background-color: var(--background-color-sider);
+  padding: var(--spacing-md);
+  overflow-y: auto;
+  overflow-x: hidden;
 
   .common {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-xs);
-    border-bottom: 1px solid var(--border-color);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--border-color-light);
+    margin-bottom: var(--spacing-md);
   }
-
 }
-
-.infinite-list {
-  padding: 0;
-  margin: 25px 0;
-  list-style: none;
-  scroll-snap-type: none;
-
-}
-
-.infinite-list .infinite-list-item {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 50px;
-  margin: 10px;
-  background-color: red;
-}
-
-.infinite-list .infinite-list-item+.list-item {
-  margin-top: 10px;
-}
-
 
 .own {
   display: flex;
   flex-direction: column;
   padding: var(--spacing-md) 0;
   gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+
   .own-header {
     display: flex;
+    align-items: center;
+    padding: var(--spacing-xs) var(--spacing-md);
+    margin-bottom: var(--spacing-xs);
 
     span {
       color: var(--text-color-light);
-      padding-left: 14px;
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
   }
-  .func{
+
+  .func {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-xs);
-    .more{
+    gap: 2px;
+
+    .more {
       display: flex;
       align-items: center;
       gap: var(--spacing-xs);
       color: var(--text-color-light);
-      padding-left: 14px;
-      &:hover{
-        color: var(--text-color-primary);
-        cursor: pointer;
-        transition: all 0.3s;
-        & .iconfont{
-          filter: brightness(0.5);
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-radius: var(--border-radius-md);
+      cursor: pointer;
+      transition: var(--transition-all);
+      font-size: var(--font-size-sm);
+
+      &:hover {
+        color: var(--text-color);
+        background-color: var(--background-color-sider-hover);
+
+        .iconfont {
+          opacity: 0.8;
         }
+      }
+
+      .iconfont {
+        font-size: var(--icon-size-sm);
+        transition: var(--transition-all);
       }
     }
   }
 }
-.song-menu{
+
+.song-menu {
   display: flex;
   flex-direction: column;
   padding: var(--spacing-md) 0;
   gap: var(--spacing-xs);
   margin-top: var(--spacing-md);
-  border-top: 1px solid var(--border-color);
-  .menu-header{
+  border-top: 1px solid var(--border-color-light);
+
+  .menu-header {
     display: flex;
     align-items: center;
     color: var(--text-color-light);
-    padding-left: 14px;
+    padding: var(--spacing-xs) var(--spacing-md);
     gap: var(--spacing-xs);
-    &:hover{
-      color: var(--text-color-primary);
-      cursor: pointer;
-      transition: all 0.3s;
-      & .iconfont{
-        filter: brightness(0.5);
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: var(--transition-all);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    &:hover {
+      color: var(--text-color);
+      background-color: var(--background-color-sider-hover);
+
+      .iconfont {
+        opacity: 0.8;
       }
     }
+
+    .title {
+      flex: 1;
+    }
+
+    .menuNumber {
+      font-size: var(--font-size-xs);
+      opacity: 0.7;
+    }
+
+    .iconfont {
+      font-size: var(--icon-size-sm);
+      transition: var(--transition-all);
+    }
+  }
+
+  .song-menu-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
 }
 </style>

@@ -6,12 +6,18 @@ import { useUserStore } from '@/stores/user'
 import { useSongMenuListStore } from './stores/songMenuList';
 import { useSongListStore } from './stores/songList';
 import { useAdminPlaylistStore } from './stores/AdminPlaylist';
+import { useThemeStore } from '@/stores/theme';
+
 const adminPlaylistStore = useAdminPlaylistStore()
 const songListStore = useSongListStore()
 const userStore = useUserStore()
 const songMenuListStore = useSongMenuListStore()
+const themeStore = useThemeStore()
 const initializing = ref(true)
+
 onMounted(async()=>{
+  // 初始化主题
+  themeStore.initTheme()
   await verifytoken()
   await initList()
    initializing.value = false

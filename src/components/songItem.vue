@@ -57,75 +57,53 @@ const handleClick = () => {
 .menu-item {
   display: flex;
   align-items: center;
-  padding: 8px 14px;
+  padding: var(--spacing-sm) var(--spacing-md);
   cursor: pointer;
-  transition: background-color 0.2s ease;
-  border-radius: 10px;
+  transition: var(--transition-all);
+  border-radius: var(--border-radius-md);
+  position: relative;
+  margin: 2px 0;
 
   &:hover {
     background-color: var(--background-color-sider-hover);
   }
 
   &.selected {
-    background-color: #ff4d4d;
-    color: white;
+    background-color: var(--background-color-selected);
+    color: var(--text-color-white);
 
     .menu-font {
       filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg);
     }
 
     .menu-badge {
-      background-color: white;
+      background-color: var(--text-color-white);
+    }
+
+    .menu-text,
+    .menu-iconfont {
+      color: var(--text-color-white);
+      font-weight: var(--font-weight-normal);
     }
   }
 }
 
-// 将文本截断样式移到这里，使其在所有状态下都生效
-.menu-text {
-  font-size: var(--font-size-lg);
-  color: var(--text-color);
-  flex: 1;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.menu-iconfont {
-  font-size: var(--font-size-sm);
-  color: var(--text-color);
-  flex: 1;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-// 选中状态下的文字颜色覆盖
-.selected {
-  .menu-text,
-  .menu-iconfont {
-    color: white;
-  }
-}
-
 .menu-icon {
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: var(--spacing-sm);
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
 
   img {
     width: 100%;
     height: 100%;
-    border-radius: 10%;
-    object-fit: contain;
+    object-fit: cover;
+    border-radius: var(--border-radius-sm);
   }
 }
 
@@ -134,66 +112,55 @@ const handleClick = () => {
   align-items: center;
   justify-content: center;
   margin-right: var(--spacing-sm);
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
 
   .iconfont {
-    font-size: var(--font-size-xl);
+    font-size: var(--icon-size-lg);
+    color: var(--text-color);
+    transition: var(--transition-all);
   }
 }
 
-.menu-badge {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #ff4d4d;
-  margin-left: 4px;
+.menu-item.selected .menu-font .iconfont {
+  color: var(--text-color-white);
 }
-.menu-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: var(--spacing-sm);
-  width: 40px;
-  height: 40px;
-
-  img {
-    width: 100%;
-    height: 100%;
-    border-radius: 10%;
-    object-fit: contain;
-  }
-
-}
-
-.menu-font {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: var(--spacing-sm);
-
-  .iconfont {
-    font-size: var(--font-size-xl);
-  }
-
-}
-
 
 .menu-text {
-  font-size: var(--font-size-md);
-  color: #333;
+  font-size: var(--font-size-sm);
+  color: var(--text-color);
   flex: 1;
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: var(--transition-all);
 }
 
 .menu-iconfont {
   font-size: var(--font-size-sm);
-  color: #333;
+  color: var(--text-color);
   flex: 1;
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: var(--transition-all);
 }
 
 .menu-badge {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #ff4d4d;
-  margin-left: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--border-radius-round);
+  background-color: var(--primary-color);
+  margin-left: var(--spacing-xs);
+  flex-shrink: 0;
 }
 </style>

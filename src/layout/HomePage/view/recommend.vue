@@ -148,48 +148,79 @@ const handlePlay = (song) => {
 
 <style lang="scss" scoped>
 .container {
-    margin: 1% 5%;
-    width: 90%;
-    // overflow: hidden;
+    margin: 0;
+    width: 100%;
     background-color: var(--background-color);
-    padding-bottom: 100px;
+    padding: calc(var(--spacing-xl) + 18px);
+    padding-bottom: 120px;
+    overflow-y: auto;
+    height: 100%;
 }
 
 .header {
     display: flex;
     justify-content: flex-start;
     gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
 
     .carousel {
         width: 40%;
         height: 250px;
-        border-radius: 15px;
+        border-radius: var(--border-radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
 
         img {
             width: 100%;
             height: 100%;
-
+            object-fit: cover;
         }
     }
 
     .header-recently {
-        width: 50%;
-        padding: 10px 20px;
-        background-color: white;
-        border-radius: 10px;
+        flex: 1;
+        padding: var(--spacing-lg);
+        background-color: var(--background-color-white);
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--shadow-sm);
 
         .title {
             display: flex;
             flex-direction: row;
             align-items: flex-end;
+            margin-bottom: var(--spacing-md);
+
+            .greet {
+                color: var(--text-color);
+                margin-right: var(--spacing-sm);
+            }
+
+            .desc {
+                color: var(--text-color-light);
+                font-size: var(--font-size-sm);
+            }
         }
 
         .recommend-cards {
-            display: flex;
-            gap: 16px;
-            flex-wrap: nowrap;
-            justify-content: space-between;
-            padding: 16px 0;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--spacing-lg);
+            width: 100%;
+            align-items: stretch;
+
+            // 确保所有卡片大小一致
+            > * {
+                width: 100%;
+                min-width: 0;
+            }
+
+            @media (max-width: 1400px) {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            @media (max-width: 768px) {
+                grid-template-columns: 1fr;
+            }
         }
     }
 }
@@ -198,18 +229,48 @@ const handlePlay = (song) => {
     width: 100%;
     display: flex;
     flex-direction: column;
+    margin-bottom: var(--spacing-xl);
 
     .CardList-title {
         font-size: var(--font-size-xl);
-        font-weight: var(--font-weight-border);
-        color: var(--text-color-light);
-        margin: 20px 0;
+        font-weight: var(--font-weight-bold);
+        color: var(--text-color);
+        margin: var(--spacing-lg) 0 var(--spacing-md) 0;
     }
 
     .CardList {
-        display: flex;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: var(--spacing-xl);
         width: 100%;
-        gap: 50px;
+        align-items: start;
+
+        // 确保所有卡片大小一致
+        > * {
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        @media (min-width: 1600px) {
+            grid-template-columns: repeat(6, 1fr);
+        }
+
+        @media (min-width: 1200px) and (max-width: 1599px) {
+            grid-template-columns: repeat(5, 1fr);
+        }
+
+        @media (min-width: 900px) and (max-width: 1199px) {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        @media (min-width: 600px) and (max-width: 899px) {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        @media (max-width: 599px) {
+            grid-template-columns: repeat(2, 1fr);
+        }
     }
 }
 
@@ -220,15 +281,15 @@ const handlePlay = (song) => {
 
     .CardList-title {
         font-size: var(--font-size-xl);
-        font-weight: var(--font-weight-border);
-        color: var(--text-color-light);
-        margin: 20px 0;
+        font-weight: var(--font-weight-bold);
+        color: var(--text-color);
+        margin: var(--spacing-lg) 0 var(--spacing-md) 0;
     }
 
     .CardList {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: var(--spacing-xl);
+        gap: var(--spacing-lg);
         width: 100%;
 
         // 平板设备

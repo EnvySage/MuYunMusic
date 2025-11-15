@@ -1,28 +1,35 @@
 /* ==================== 根变量（默认主题 - 白天模式） ==================== */
 :root {
-  /* 主题色 */
-  --primary-color: #ea3e3e;           /* 网易云红 */
+  /* 主题色 - 网易云风格 */
+  --primary-color: #ec4141;           /* 网易云红 */
+  --primary-color-hover: #d73535;     /* 悬停状态 */
+  --primary-color-light: #ff6b6b;     /* 浅红色 */
   --secondary-color: #f0f3f6;         /* 次色调 */
-  --third-color: #f7f9fc;         /* 次色调 */
-  --button-color: #bdbdbdff;
+  --third-color: #f7f9fc;             /* 第三色调 */
+  --button-color: #bdbdbd;
   
   /* 文字颜色 */
-  --text-color: #000000ff;                 /* 主要文字 */
-  --text-color-light: #666;           /* 浅色文字 */
-  --text-color-lighter: #c2c1c1ff;         /* 更浅文字 */
+  --text-color: #333333;              /* 主要文字 */
+  --text-color-primary: #000000;       /* 主要文字（更深） */
+  --text-color-light: #666666;        /* 浅色文字 */
+  --text-color-lighter: #999999;      /* 更浅文字 */
+  --text-color-disabled: #c2c1c1;      /* 禁用文字 */
   --text-color-white: #ffffff;
   
   /* 背景色 */
-  --background-color: #f9f9f9;        /* 默认背景 */
+  --background-color: #ffffff;        /* 默认背景 */
+  --background-color-secondary: #f9f9f9;  /* 次要背景 */
+  --background-color-tertiary: #f5f5f5;   /* 第三背景 */
   --background-color-dark: #2e2e2e;   /* 夜间背景 */
-  --background-color-sider: #f0f3f6;
-  --background-color-sider-dark: #2e2e2e;
-  --background-color-sider: #f7f9fc;
-  --background-color-sider-hover: #e4e8ec;
+  --background-color-sider: #f7f9fc;  /* 侧边栏背景 */
+  --background-color-sider-hover: #e4e8ec; /* 侧边栏悬停 */
+  --background-color-selected: #ec4141; /* 选中背景 */
   --background-color-white: #ffffff;
 
   /* 边框 */
   --border-color: #e0e0e0;            /* 边框颜色 */
+  --border-color-light: #f0f0f0;      /* 浅边框 */
+  --border-color-dark: #d0d0d0;       /* 深边框 */
   
   /* 间距（基于 8px 单位） */
   --spacing-unit: 8px;
@@ -70,26 +77,62 @@
   --border-radius-sm: 4px;
   --border-radius-md: 8px;
   --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+  --border-radius-round: 50%;
   
   /* 阴影 */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.16);
+  --shadow-hover: 0 6px 16px rgba(0, 0, 0, 0.12);
   
   /* 动画 */
-  --transition-fast: 0.2s ease;
+  --transition-fast: 0.15s ease;
   --transition-normal: 0.3s ease;
   --transition-slow: 0.5s ease;
+  --transition-all: all var(--transition-normal);
+  
+  /* Z-index层级 */
+  --z-index-base: 1;
+  --z-index-dropdown: 1000;
+  --z-index-sticky: 1020;
+  --z-index-fixed: 1030;
+  --z-index-modal-backdrop: 1040;
+  --z-index-modal: 1050;
+  --z-index-popover: 1060;
+  --z-index-tooltip: 1070;
 }
 
 /* ==================== 夜间模式 ==================== */
 [data-theme="dark"] {
-  --primary-color: #1a1a21;           /* 暗红色 */
-  --secondary-color: #13131a; 
-  --third-color: #13131a; 
-  --background-color: #13131a;        /* 深灰背景 */
-  --text-color: #f0f0f0;              /* 亮色文字 */
-  --text-color-light: #cccccc;
-  --text-color-lighter: #aaaaaa;
-  --border-color: #444;
+  /* 主题色 */
+  --primary-color: #ec4141;           /* 保持红色 */
+  --primary-color-hover: #d73535;
+  --primary-color-light: #ff6b6b;
+  --secondary-color: #1e1e24;
+  --third-color: #25252d;
+  --button-color: #666666;
+  
+  /* 文字颜色 */
+  --text-color: #e0e0e0;              /* 亮色文字 */
+  --text-color-primary: #ffffff;      /* 主要文字（更亮） */
+  --text-color-light: #b0b0b0;       /* 浅色文字 */
+  --text-color-lighter: #888888;     /* 更浅文字 */
+  --text-color-disabled: #666666;    /* 禁用文字 */
+  --text-color-white: #ffffff;
+  
+  /* 背景色 */
+  --background-color: #141414;        /* 深色背景 */
+  --background-color-secondary: #1a1a1a;  /* 次要背景 */
+  --background-color-tertiary: #1f1f1f;   /* 第三背景 */
+  --background-color-dark: #0d0d0d;   /* 更深背景 */
+  --background-color-sider: #1a1a1a;  /* 侧边栏背景 */
+  --background-color-sider-hover: #252525; /* 侧边栏悬停 */
+  --background-color-selected: #ec4141; /* 选中背景 */
+  --background-color-white: #1a1a1a;
+
+  /* 边框 */
+  --border-color: #333333;            /* 边框颜色 */
+  --border-color-light: #2a2a2a;      /* 浅边框 */
+  --border-color-dark: #404040;       /* 深边框 */
 }

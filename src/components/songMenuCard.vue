@@ -73,18 +73,20 @@ const handlePlay = () => {
 
 <style scoped>
 .music-card {
-  width: 200px;
-  height: 250px;
+  width: 100%;
+  aspect-ratio: 4 / 5;
   position: relative;
-  border-radius: 8px;
+  border-radius: var(--border-radius-lg);
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  transition: var(--transition-all);
+  box-shadow: var(--shadow-md);
+  background: var(--background-color-white);
 }
 
 .music-card:hover {
-  transform: scale(1.02);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
 }
 
 .card-background {
@@ -104,35 +106,44 @@ const handlePlay = () => {
   right: 0;
   bottom: 0;
   height: 60px;
-  backdrop-filter: blur(100px);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
   z-index: 2;
 }
 
 .hover-content {
   position: absolute;
-  top: calc(100% - 145px);
   left: 0;
   right: 0;
-  bottom: -80%;
-  backdrop-filter: blur(30px);
-  -webkit-mask: linear-gradient(to top, black 70%, transparent);
-  mask: linear-gradient(to top, black 70%, transparent);
+  bottom: 0;
+  height: 30%;
+  backdrop-filter: blur(15px);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 40%, transparent 100%);
   color: var(--text-color-white);
-  padding: 16px;
+  padding: var(--spacing-md);
   z-index: 3;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  transition: all 0.5s ease;
-  padding-top: 50%;
+  justify-content: flex-end;
+  transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1), background 0.5s ease, backdrop-filter 0.5s ease;
+  overflow: hidden;
 }
+
 .show {
-  top: 0;
-  bottom: 0;
+  height: 60%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.85) 20%, rgba(0, 0, 0, 0.7) 40%, rgba(0, 0, 0, 0.5) 60%, rgba(0, 0, 0, 0.3) 80%, transparent 100%);
+  backdrop-filter: blur(25px);
+  justify-content: space-between;
 }
 
 .song-info {
-  margin-bottom: 16px;
+  margin-bottom: 0;
+  opacity: 1;
+  transform: translateY(0);
+  transition: margin-bottom 0.3s ease 0.2s;
+}
+
+.show .song-info {
+  margin-bottom: var(--spacing-md);
 }
 
 .song-title {
@@ -156,8 +167,20 @@ const handlePlay = () => {
 }
 
 .song-list {
-  flex-grow: 1;
-  margin-bottom: 16px;
+  flex: 1;
+  margin-bottom: var(--spacing-md);
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.4s ease 0.3s, transform 0.4s ease 0.3s, max-height 0.5s ease 0.3s, margin-bottom 0.3s ease 0.3s;
+}
+
+.show .song-list {
+  opacity: 1;
+  transform: translateY(0);
+  max-height: 300px;
+  margin-bottom: var(--spacing-md);
 }
 
 .track-item {
@@ -180,22 +203,39 @@ const handlePlay = () => {
 
 .play-button {
   position: absolute;
-  bottom: 5%;
-  right: 5%;
+  bottom: var(--spacing-md);
+  right: var(--spacing-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  margin: 0 auto;
+  width: 44px;
+  height: 44px;
+  background: var(--primary-color);
+  border-radius: var(--border-radius-round);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--transition-all);
+  box-shadow: var(--shadow-md);
+  z-index: 10;
+  opacity: 0;
+  transform: scale(0.8);
+
+  .iconfont {
+    color: var(--text-color-white);
+    font-size: var(--icon-size-lg);
+    margin-left: 2px;
+  }
+
+  &:hover {
+    background: var(--primary-color-hover);
+    transform: scale(1.1);
+    box-shadow: var(--shadow-lg);
+  }
 }
 
-.play-button:hover {
-  background: rgba(255, 255, 255, 0.8);
+.show .play-button {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.3s ease 0.4s, transform 0.3s ease 0.4s;
 }
 
 .icon-play {
@@ -208,11 +248,19 @@ const handlePlay = () => {
 .card-title { 
   position: absolute;
   color: var(--text-color-white);
-  font-weight: bolder;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-sm);
   z-index: 7;
   width: 100%;
-  padding: 10px;
-  background:linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 90%, transparent);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, transparent 100%);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 
