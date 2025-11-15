@@ -1,50 +1,36 @@
-<!-- src/components/SongListContent.vue -->
 <template>
-  <div class="song-list-content">
-    <el-table :data="songs" style="width: 100%"
-      :default-sort="{ prop: 'id', order: 'ascending' }"
-      highlight-current-row
+  <div class="table-container">
+    <el-table :data="songs" style="width: 100%" :show-header="false" row-class-name="song-table-row"
       @row-click="handleRowClick">
-      <el-table-column prop="id" label="#" width="60" sortable align="center" fixed>
+      <el-table-column prop="index" label="" width="40">
         <template #default="scope">
-          <div class="index-cell">
+          <div class="index-cell" style="cursor: pointer;">
             {{ scope.$index + 1 }}
           </div>
         </template>
       </el-table-column>
-      <el-table-column min-width="300" prop="name" label="标题" show-overflow-tooltip>
+      <el-table-column label="歌曲" min-width="300">
         <template #default="scope">
-          <div class="song-info" style="display: flex; gap: 10px;">
-            <div class="song-cover" style="width: 60px; height: 60px;">
+          <div class="song-info" style="display: flex; align-items: center; gap: 10px;">
+            <div class="album-cover" style="width: 40px; height: 40px; flex-shrink: 0;">
               <img :src="scope.row.coverUrl" alt="专辑封面" style="width: 100%; height: 100%; object-fit: cover; border-radius: 5px;">
             </div>
-            <div class="song-details">
-              <div class="song-title" style="font-weight: bolder; font-size: large;">{{ scope.row.name }}</div>
-              <div class="song-meta" style="display: flex; gap: 15px; color: gray">
-                <span class="singer" style="font-weight: bolder; font-size: larger;">{{ scope.row?.artistName || ""}}</span>
-                <span class="album">{{ scope.row.album }}</span>
-              </div>
+            <div class="song-details" style="display: flex; flex-direction: column;">
+              <span class="song-title" :class="{ 'playing': isCurrentSong(scope.row) }" style="font-weight: bolder; font-size: larger;">{{ scope.row?.name || ""}}</span>
+              <span class="singer" style="font-weight: bolder; font-size: larger;">{{ scope.row?.artistName || ""}}</span>
             </div>
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="album" label="专辑" min-width="150" show-overflow-tooltip>
+      <el-table-column prop="albumName" label="专辑" min-width="150" />
+      <el-table-column label="收藏" width="60" align="center">
         <template #default="scope">
-          <div class="album-cell">
-            {{ scope.row.album }}
+          <div class="like-cell" @click.stop="handleLike(scope.row)">
+            <div class="iconfont" :class="scope.row.like ? 'icon-xihuan' : 'icon-dianzan-xiankuang'"
+              style="font-size: 20px; cursor: pointer;"></div>
           </div>
         </template>
       </el-table-column>
-      <!-- 喜欢列 -->
-      <el-table-column label="喜欢" width="80" align="center">
-        <template #default="scope">
-          <div class="like-cell">
-            <div class="iconfont" :class="scope.row.like ? 'icon-xihuan' : 'icon-weixihuan'" 
-              @click.stop="handleLike(scope.row)"></div>
-          </div>
-        </template>
-      </el-table-column>
-      <!-- 时长列 -->
       <el-table-column prop="duration" label="时长" width="80" align="center">
         <template #default="scope">
           <div class="duration-cell">
@@ -58,48 +44,125 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useCollectorStore } from '@/stores/CollectorStore'
 import { useSongListStore } from '@/stores/songList'
-const emit = defineEmits(['row-click'])
-const collectorStore = useCollectorStore()
+import { useCollectorStore } from '@/stores/CollectorStore'
+import { useMusicPlayerStore } from '@/stores/musicPlayer'
 const songListStore = useSongListStore()
+const collectorStore = useCollectorStore()
+const musicPlayerStore = useMusicPlayerStore()
 const props = defineProps({
   songs: {
     type: Array,
     required: true
   },
-  playlistId: {
-    type: String,
-    default: ""
+  playlistId:{
+    type:String,
+    required:true
   }
 })
+const emits = defineEmits(['row-click'])
 
+const formatDuration = (seconds) => {
+  if (!seconds || seconds <= 0) return '0:00'
+  
+  const minutes = Math.floor(seconds / 60)
+  const remainingSeconds = Math.floor(seconds % 60)
+  
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+}
 
-// 处理行点击
 const handleRowClick = (row) => {
-  emit('row-click', row)
+  emits('row-click', row)
+}
+
+// 判断是否为当前播放的歌曲
+const isCurrentSong = (row) => {
+  return musicPlayerStore.currentSong.id === row.id
 }
 
 // 处理喜欢/取消喜欢
 const handleLike = async(row) => {
   await collectorStore.addLikeSong(row.id)
   songListStore.getAllSongList(props.playlistId)
-}
-
-// 格式化时长
-const formatDuration = (seconds) => {
-  if (!seconds || seconds <= 0) return '0:00'
-  const minutes = Math.floor(seconds / 60)
-  const remainingSeconds = Math.floor(seconds % 60)
-  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+  // 同步更新当前播放歌曲的收藏状态
+  if (musicPlayerStore.currentSong.id === row.id) {
+    musicPlayerStore.setCurrentSongLike(!row.like)
+  }
 }
 </script>
 
-<style scoped>
-.song-list-content {
-  margin-top: 10px;
+<style lang="scss" scoped>
+.table-container {
+  :deep(.el-table) {
+    background-color: transparent;
+
+    .song-table-row {
+      background-color: var(--background-color-white);
+      cursor: pointer;
+
+      &:hover {
+        background-color: var(--background-color-hover) !important;
+      }
+
+      &.playing {
+        color: var(--primary-color);
+      }
+    }
+
+    .el-table__inner-wrapper::before {
+      height: 0;
+    }
+
+    .el-table__row {
+      height: 80px;
+
+      .cell {
+        padding: 0 5px;
+      }
+    }
+  }
 }
-.iconfont {
-  font-size: 20px;
+
+.index-cell {
+  text-align: center;
+  color: var(--text-color-lighter);
+  font-size: var(--font-size-sm);
+}
+
+.song-info {
+  .song-title {
+    font-weight: var(--font-weight-bold);
+    margin-bottom: 4px;
+    color: var(--text-color);
+    
+    &.playing {
+      color: var(--primary-color);
+    }
+  }
+  
+  .singer {
+    font-size: var(--font-size-sm);
+    color: var(--text-color-light);
+  }
+}
+
+.like-cell {
+  .iconfont {
+    color: var(--text-color-light);
+    transition: all 0.3s ease;
+    
+    &.icon-xihuan {
+      color: var(--primary-color);
+    }
+    
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+}
+
+.duration-cell {
+  color: var(--text-color-light);
+  font-size: var(--font-size-sm);
 }
 </style>

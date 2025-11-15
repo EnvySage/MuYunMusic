@@ -112,7 +112,7 @@ const handlePause = () => {
 
 const handleEnded = () => {
   musicPlayerStore.setCurrentTime(0)
-  // 先获取下一首歌曲
+  // 获取下一首歌曲
   const nextSong = playerStore.nextSong()
   
   // 如果有下一首歌曲，则播放它
@@ -123,7 +123,6 @@ const handleEnded = () => {
       musicPlayerStore.togglePlay()
     }, 100)
   } else {
-
     musicPlayerStore.setPlayingState(false)
   }
 }

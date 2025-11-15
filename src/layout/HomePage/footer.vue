@@ -26,15 +26,15 @@
             </div>
         </div>
         <div class="audioControllContainer">
-            <div class="audioControl" :style="{ 'filter': lyricStore.lyricPage ? 'invert(100%)' : 'invert(0%)' }">
-                <div class="iconfont icon-dianzan-xiankuang"></div>
+            <div class="audioControl" >
+                <div class="iconfont" :class="musicPlayerStore.currentSong.like? 'icon-xihuan':'icon-dianzan-xiankuang'" :style="{color:musicPlayerStore.currentSong.like? 'red': 'none'}"></div>
                 <div class="iconfont icon-shangyiji" @click="switchplayer(0)"></div>
                 <div class="iconfont" :class="musicPlayerStore.isPlaying ? 'icon-zanting1' : 'icon-bofang1'"
                     style="padding: 5px; background-color: red; border-radius: 50%; color: white;" @click="togglePlay"
-                    :style="{ 'filter': lyricStore.lyricPage ? 'invert(100%)' : 'invert(0%)' }">
+                    >
                 </div>
                 <div class="iconfont icon-xiayiji" @click="switchplayer(1)"></div>
-                <div class="iconfont icon-suijibofang"></div>
+                <div class="iconfont" :class="playerStore.playModeIcon" @click="togglePlayMode"></div>
             </div>
             <div class="audioProgress" v-if="!lyricStore.lyricPage">
                 <el-slider v-model="progressValue" :min="0" :max="100" :step="1" @change="onProgressChange"
@@ -84,6 +84,12 @@ const switchplayer = (upAnddown) => {
     }
     console.log('切换歌曲' + playerStore.currentSongIndex)
 }
+
+// 切换播放模式
+const togglePlayMode = () => {
+    playerStore.togglePlayMode()
+}
+
 // 切换音量面板显示
 const toggleVolumePanel = (event) => {
     event.stopPropagation()

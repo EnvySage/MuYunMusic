@@ -218,10 +218,22 @@ const adjustLyricOffset = (delta) => {
   position: relative;
   width: 100%;
   min-height: 100vh;
+  background: #0d0d0d;
   background-size: cover;
   background-position: center;
   display: flex;
   flex-direction: column;
+  /* 深色遮罩层，参考网易云风格 */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.65) 100%);
+    z-index: 1;
+  }
   .playerHeader{
     width: 100%;
     height: 50px;
@@ -233,15 +245,19 @@ const adjustLyricOffset = (delta) => {
       height: 50px;
       aspect-ratio: 1;
       font-size: 30px;
-      color: white;
+      color: rgba(255, 255, 255, 0.9);
       display: flex;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(1000px);
-      background-color: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      border-radius: 10px;
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: 50%;
       transform: rotate(-90deg);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.5);
+        color: #fff;
+      }
     }
   }
 }
@@ -250,7 +266,8 @@ const adjustLyricOffset = (delta) => {
   width: 100%;
   height: 100vh;
   align-items: center;
-  backdrop-filter: blur(1000px);
+  position: relative;
+  z-index: 2;
   .albumBox{
     width: 50%;
     .album-cover {
@@ -259,7 +276,7 @@ const adjustLyricOffset = (delta) => {
       border-radius: 50%;
       overflow: hidden;
       margin: 0 auto;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
       
       img {
         animation: rotateAlbum 20s linear infinite;
@@ -288,25 +305,27 @@ const adjustLyricOffset = (delta) => {
 }
 
 .song-info {
-  margin-bottom: 25px;
+  margin-bottom: 30px;
+  padding: 0;
 }
 
 .song-title {
-  font-size: 30px;
-  font-weight: bold;
-  margin-bottom: 5px;
+  font-size: 28px;
+  font-weight: 500;
+  margin-bottom: 8px;
   color: #fff;
 }
 
 .song-artist {
   font-size: 16px;
-  color: #aaa;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 15px;
 }
 
 .lyrics-container {
   height: 700px;
   overflow-y: auto;
-  padding: 10px;
+  padding: 0;
   scroll-behavior: smooth;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE/Edge */
@@ -317,38 +336,35 @@ const adjustLyricOffset = (delta) => {
 }
 
 .lyric-line {
-  margin-bottom: 20px;
-  transition: all 0.3s ease-in-out;
-  opacity: 0.3;
-  color: white;
-  min-height: 50px;
+  margin-bottom: 24px;
+  transition: all 0.4s ease;
+  opacity: 0.5;
+  color: rgba(255, 255, 255, 0.65);
+  min-height: auto;
   display: flex;
   align-items: center;
   gap: 15px;
-  transform: translateY(20px);
-  transition-delay: calc(0.05s * var(--index));
+  padding: 0;
 }
 
 .lyric-line.before-active {
-  opacity: 0.6;
-  font-size: 24px;
-  transform: translateY(0);
+  opacity: 0.7;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .lyric-line.active {
   opacity: 1;
-  color: #ff3e3e;
-  font-size: 30px;
-  font-weight: bold;
-  margin: 15px 0;
-  transform: translateY(0);
-  text-shadow: 0 0 10px rgba(255, 62, 62, 0.5);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 400;
+  margin: 20px 0;
 }
 
 .lyric-line.after-active {
-  opacity: 0.6;
-  font-size: 24px;
-  transform: translateY(0);
+  opacity: 0.7;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.75);
 } 
 
 .japanese-lyric {
@@ -357,18 +373,19 @@ const adjustLyricOffset = (delta) => {
 }
 
 .chinese-lyric {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.65);
   font-size: 14px;
   transition: all 0.3s ease;
+  margin-top: 4px;
 }
 
 .lyric-line.active .japanese-lyric {
-  font-size: 1.2em;
+  font-size: 1em;
 }
 
 .lyric-line.active .chinese-lyric {
-  font-size: 1.1em;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9em;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .player-controls {
@@ -463,6 +480,7 @@ const adjustLyricOffset = (delta) => {
   flex: 1;
   margin-left: 10px;
   -webkit-appearance: none;
+  appearance: none;
   height: 4px;
   background: #333;
   border-radius: 2px;
@@ -471,6 +489,7 @@ const adjustLyricOffset = (delta) => {
 
 .volume-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
+  appearance: none;
   width: 12px;
   height: 12px;
   background: #ff3e3e;
@@ -484,26 +503,29 @@ const adjustLyricOffset = (delta) => {
 }
 
 .lyric-offset-control {
-  margin-top: 10px;
-  font-size: 14px;
-  color: #888;
+  margin-top: 15px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
 .lyric-offset-control button {
-  background: #333;
-  border: none;
-  color: #fff;
-  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  padding: 4px 10px;
   border-radius: 4px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  font-size: 12px;
 }
 
 .lyric-offset-control button:hover {
-  background: #444;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
 }
 
 .time-tag {
@@ -514,4 +536,3 @@ const adjustLyricOffset = (delta) => {
   text-align: right;
 }
 </style>
-

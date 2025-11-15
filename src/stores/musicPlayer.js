@@ -23,7 +23,8 @@ export const useMusicPlayerStore = defineStore('musicPlayer', () => {
     artist: '',
     url: '',
     cover: '',
-    id:""
+    id:"",
+    like: false
   })
   
   // 歌词文本
@@ -84,7 +85,10 @@ export const useMusicPlayerStore = defineStore('musicPlayer', () => {
       audioElement.value.pause();
     }
     
-    currentSong.value = song;
+    currentSong.value = {
+      ...currentSong.value,
+      ...song
+    };
     
     // 等待 DOM 更新后重新开始播放
     setTimeout(() => {
@@ -111,6 +115,16 @@ export const useMusicPlayerStore = defineStore('musicPlayer', () => {
         playWhenReady();
       }
     }, 0);
+  }
+
+  // 更新当前歌曲的收藏状态
+  const setCurrentSongLike = (like) => {
+    currentSong.value.like = like
+  }
+
+  // 切换当前歌曲的收藏状态
+  const toggleCurrentSongLike = () => {
+    currentSong.value.like = !currentSong.value.like
   }
 
   // 设置歌词文本
@@ -151,6 +165,8 @@ export const useMusicPlayerStore = defineStore('musicPlayer', () => {
     setCurrentTime,
     setDuration,
     setCurrentSong,
+    setCurrentSongLike,
+    toggleCurrentSongLike,
     setLyricText,
     adjustLyricOffset,
     resetLyricOffset

@@ -163,7 +163,8 @@ const handleRowClick = (row) => {
         artist: row.artistName,
         url: row.musicUrl,
         cover: row.coverUrl,
-        id: row.id
+        id: row.id,
+        like: row.like || false
     }
     const duration = row.duration
     musicPlayerStore.setCurrentSong(song)
@@ -196,7 +197,6 @@ const collectDebounceTimer = ref(null)
 const handleCollect = () => {
     // 立即更新UI状态
     isCollected.value = !isCollected.value
-    
     // 清除之前的定时器
     if (collectDebounceTimer.value) {
         clearTimeout(collectDebounceTimer.value)
