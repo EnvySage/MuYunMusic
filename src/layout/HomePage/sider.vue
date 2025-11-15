@@ -73,14 +73,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted,watch } from 'vue';
 import songItem from '@/components/songItem.vue';
-import { useRouter } from 'vue-router';
+import { useRouter,useRoute } from 'vue-router';
 import { useSongMenuListStore } from '@/stores/songMenuList';
 import { useUserStore } from '@/stores/user';
 const userStore = useUserStore();
 const songMenuListStore = useSongMenuListStore();
 const router = useRouter();
+const route = useRoute();
 
 const iconfontList = [{
   iconfont: 'icon-home_fill_light',
@@ -118,11 +119,39 @@ onMounted(() => {
   console.log(songMenuList.value);
   console.log(collectedSongMenuList.value);
 });
+
+watch(
+  () => songMenuListStore.songMenuList,
+  (newList) => {
+    songMenuList.value = [...newList];
+  },
+  { deep: true }
+);
+
+// 监听收藏歌单列表的变化，实现动态更新
+watch(
+  () => songMenuListStore.collectMenuList,
+  (newList) => {
+    collectedSongMenuList.value = [...newList];
+  },
+  { deep: true }
+);
+
+const selectedKey = ref('common_0');
+watch(
+  () => route.name,
+  (newRouteName) => {
+    if (newRouteName === 'recommend') {
+      selectedKey.value = 'common_0';
+    }
+  },
+  { immediate: true }
+);
+
 const listEnd = ref(8);
 const commonList = computed(() => iconfontList.slice(0, 5));
 const ownList = computed(() => iconfontList.slice(5, listEnd.value));
 
-const selectedKey = ref('common_0');
 
 const isExpand = computed(() => listEnd.value > 8);
 

@@ -39,7 +39,7 @@
       <el-table-column label="喜欢" width="80" align="center">
         <template #default="scope">
           <div class="like-cell">
-            <div class="iconfont icon-heart" :class="{ 'active': scope.row.isLiked }"
+            <div class="iconfont" :class="scope.row.like ? 'icon-xihuan' : 'icon-weixihuan'" 
               @click.stop="handleLike(scope.row)"></div>
           </div>
         </template>
@@ -58,15 +58,22 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-
+import { useCollectorStore } from '@/stores/CollectorStore'
+import { useSongListStore } from '@/stores/songList'
+const emit = defineEmits(['row-click'])
+const collectorStore = useCollectorStore()
+const songListStore = useSongListStore()
 const props = defineProps({
   songs: {
     type: Array,
     required: true
+  },
+  playlistId: {
+    type: String,
+    default: ""
   }
 })
 
-const emit = defineEmits(['row-click', 'like'])
 
 // 处理行点击
 const handleRowClick = (row) => {
@@ -74,8 +81,9 @@ const handleRowClick = (row) => {
 }
 
 // 处理喜欢/取消喜欢
-const handleLike = (row) => {
-  emit('like', row)
+const handleLike = async(row) => {
+  await collectorStore.addLikeSong(row.id)
+  songListStore.getAllSongList(props.playlistId)
 }
 
 // 格式化时长
@@ -90,5 +98,8 @@ const formatDuration = (seconds) => {
 <style scoped>
 .song-list-content {
   margin-top: 10px;
+}
+.iconfont {
+  font-size: 20px;
 }
 </style>

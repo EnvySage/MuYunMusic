@@ -15,7 +15,7 @@
                     <div class="albumAuthor">{{ musicPlayerStore.currentSong.artist }}</div>
                 </div>
                 <div class="albumFunction" :style="{ 'filter': lyricStore.lyricPage ? 'invert(100%)' : 'invert(0%)' }">
-                    <div class="iconfont icon-piliangguanli"></div>
+                    <div class="iconfont icon-shoucang1"></div>
                     <div class="iconfont icon-pinglun"></div>
                     <div class="iconfont icon-fenxiang"></div>
                     <div class="iconfont icon-xiazai"></div>

@@ -22,6 +22,16 @@ http.interceptors.request.use(
     }
     console.log('请求头:', config.headers)
     
+    // 处理请求数据中的ID字段，转换为字符串避免精度丢失
+    if (config.data) {
+      config.data = convertIdFieldsToString(config.data);
+    }
+    
+    // 处理URL参数中的ID字段
+    if (config.params) {
+      config.params = convertIdFieldsToString(config.params);
+    }
+    
     // 可以在这里添加其他请求前处理逻辑
      const fullUrl = http.getUri(config)
      console.log('请求:', fullUrl)
@@ -32,6 +42,31 @@ http.interceptors.request.use(
   }
 )
 
+// 递归转换请求数据中的ID字段为字符串
+function convertIdFieldsToString(data) {
+  if (typeof data === 'number' && !Number.isSafeInteger(data)) {
+    return data.toString();
+  } else if (typeof data === 'bigint') {
+    return data.toString();
+  } else if (Array.isArray(data)) {
+    return data.map(item => convertIdFieldsToString(item));
+  } else if (data !== null && typeof data === 'object') {
+    const result = {};
+    for (const key in data) {
+      if (data.hasOwnProperty(key)) {
+        // 只处理包含"id"或"Id"的字段
+        if (key.toLowerCase().includes('id') && 
+            (typeof data[key] === 'number' || typeof data[key] === 'bigint')) {
+          result[key] = data[key].toString();
+        } else {
+          result[key] = convertIdFieldsToString(data[key]);
+        }
+      }
+    }
+    return result;
+  }
+  return data;
+}
 // 响应拦截器
 http.interceptors.response.use(
   response => {

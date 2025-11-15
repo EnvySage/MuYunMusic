@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted,watch } from 'vue';
 import CollectorItem from './CollectorItem.vue';
 import { useCollectorStore } from '../../stores/CollectorStore';
 const collectorStore = useCollectorStore();
@@ -14,9 +14,14 @@ const props = defineProps({
     type: String,
     default: ""
   }
+  
 })
 onMounted(async() => {
      await collectorStore.getCollectorPlaylist(props.playlistId);
+    console.log("收藏者获取",collectorStore.collectorPlaylist)
+});
+watch(() => props.playlistId, async (newId) => {
+    await collectorStore.getCollectorPlaylist(newId);
     console.log("收藏者获取",collectorStore.collectorPlaylist)
 });
 </script>

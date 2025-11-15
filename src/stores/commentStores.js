@@ -16,10 +16,41 @@ export const useCommentStore = defineStore("comment", () => {
             console.error("Failed to fetch comments:", error);
         }
     }
+    const addRootComment = async (type,targetId,content) => {
+        try {
+            const data = {
+                targetType: type,
+                targetId: targetId,
+                content: content,
+            }
+            const res = await http.post('/comment/addComment', data)
+            console.log("addRootComment:",res)
+        } catch (error) {
+            console.error("Failed to addRootComment:", error);
+        }
+    }
+
+    const addReplyComment = async (type,targetId,content,rootId,parentId) => {
+        try {
+            const data = {
+                targetType: type,
+                targetId: targetId,
+                content: content,
+                rootId: rootId,
+                parentId: parentId
+            }
+            const res = await http.post('/comment/addComment', data)
+            console.log("addReplyComment:",res)
+        } catch (error) {
+            console.error("Failed to addReplyComment:", error);
+        } 
+    }
     return {
         commentList,
         total,
         currentId,
-        getCommentList
+        getCommentList,
+        addRootComment,
+        addReplyComment
     }
 })

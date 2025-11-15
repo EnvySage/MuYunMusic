@@ -32,7 +32,7 @@
             </div>
         </div>
         <div class="rankList">
-            <div class="CardList-title">排行榜</div>
+            <div class="CardList-title">排行榜(暂未实现)</div>
             <div class="CardList">
                 <rankList v-for="(rank, index) in rankLists" :key="index" :title="rank.title"
                     :update-frequency="rank.updateFrequency" :songs="rank.songs" />
@@ -209,7 +209,7 @@ const handlePlay = (song) => {
     .CardList {
         display: flex;
         width: 100%;
-        gap: var(--spacing-xl);
+        gap: 50px;
     }
 }
 

@@ -18,7 +18,7 @@
                 </div>
                 <div class="functionBox">
                     <div class="playButton" @click="handlePlayAll()">播放全部</div>
-                    <div class="collectButton" @click="handleCollect()">收藏</div>
+                    <div v-if="playListData.userId!=userStore.user.id" class="collectButton" @click="handleCollect()">{{ isCollected?"取消收藏":"收藏" }}</div>
                 </div>
             </div>
         </div>
@@ -36,7 +36,7 @@
         <!-- 对应的内容区域 -->
         <div class="tab-content">
             <div v-show="activeTab === '1'" class="tab-pane">
-                <playlist-song :songs="songList" @row-click="handleRowClick" @like="handleLike"></playlist-song>
+                <playlist-song :songs="songList" @row-click="handleRowClick" :playlistId="songListId"></playlist-song>
             </div>
             <div v-show="activeTab === '2'" class="tab-pane">
                 <div class="comment-content">
@@ -67,7 +67,10 @@ import avatar from '@/image/avatar.png'
 import { usePlayerStore } from '@/stores/playerList'
 import { useAdminPlaylistStore } from '@/stores/AdminPlaylist'
 import { useCommentStore } from '@/stores/commentStores'
-
+import { useCollectorStore } from '@/stores/CollectorStore'
+import { useUserStore } from '@/stores/user'
+const userStore = useUserStore()
+const collectorStore = useCollectorStore()
 const commentStore = useCommentStore()
 const adminPlaylistStore = useAdminPlaylistStore()
 const playerStore = usePlayerStore()
@@ -82,9 +85,10 @@ const totalList = computed(() => [...collectMenuList.value, ...songMenuList.valu
 const songListId = ref(route.params.id)
 const playListData = computed(() => totalList.value.find(item => item.id === songListId.value))
 
-const songList = ref([])
-const playlistUserData = ref()
 
+const songList = computed(() => songListStore.songList)
+const playlistUserData = ref()
+const isCollected = ref(false)
 // 监听路由参数变化
 watch(
     () => route.params.id,
@@ -101,23 +105,22 @@ watch(
 const loadData = async () => {
     try {
         console.log('开始加载数据，ID:', songListId.value)
-
+        
         await songListStore.getAllSongList(songListId.value)
-        songList.value = songListStore.songList
         console.log('歌曲列表加载完成:', songList.value)
-
+        
         // 加载用户数据
         const playlistData = totalList.value.find(item => item.id === songListId.value)
         console.log('找到的歌单数据:', playlistData)
-
+        
         if (playlistData && playlistData.userId) {
             const res = await request.get(`/playlist/getUserById/${playlistData.userId}`)
             playlistUserData.value = res.data
             console.log('用户数据加载完成:', playlistUserData.value)
         }
+        isCollected.value=playListData.value.isCollect
     } catch (error) {
         console.error('数据加载失败:', error)
-        songList.value = []
         playlistUserData.value = null
     }
 }
@@ -143,7 +146,7 @@ const activeTab = ref('1')
 const tabs = computed(() => [
     { index: '1', label: '歌曲', count: songList.value?.length || 0 },
     { index: '2', label: '评论', count: commentStore?.total||0 },
-    { index: '3', label: '收藏者', count: 256 }
+    { index: '3', label: '收藏者', count:  collectorStore?.collectorPlaylist.length || 0 }
 ])
 
 // 处理 tab 选择
@@ -184,8 +187,35 @@ const handlePlayAll = () => {
         musicPlayerStore.togglePlay()
     }, 100)
 }
-// 处理喜欢/取消喜欢
-const handleLike = (row) => {
+// 处理收藏
+
+// 创建一个防抖定时器引用
+const collectDebounceTimer = ref(null)
+
+// 处理收藏 - 添加防抖功能
+const handleCollect = () => {
+    // 立即更新UI状态
+    isCollected.value = !isCollected.value
+    
+    // 清除之前的定时器
+    if (collectDebounceTimer.value) {
+        clearTimeout(collectDebounceTimer.value)
+    }
+    
+    // 设置新的定时器，延迟执行后端请求
+    collectDebounceTimer.value = setTimeout(async () => {
+        try {
+            await collectorStore.addCollectorPlaylist(songListId.value)
+            console.log('收藏成功', songListId.value)
+            // 更新歌单列表
+            await songMenuListStore.getAllCollectMenuList()
+            await songMenuListStore.getAllSongMenuList()
+        } catch (error) {
+            // 如果请求失败，恢复原来的状态
+            isCollected.value = !isCollected.value
+            console.error('收藏操作失败:', error)
+        }
+    }, 2000) // 1秒防抖延迟，你可以根据需要调整时间
 }
 </script>
 

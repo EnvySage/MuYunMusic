@@ -6,8 +6,9 @@ export const useCollectorStore = defineStore("collector", () => {
 
     const getCollectorPlaylist = async (playlistId) => {
         try {
-            const response = await http.get(`/collector/getCollectorById/2/${playlistId}`);
+            const response = await http.get(`/collector/getCollectorById/1/${playlistId}`);
             collectorPlaylist.value = response.data;
+            console.log("获取到歌单",playlistId,"收藏者",collectorPlaylist.value);
         } catch (error) {
             console.error("Failed to fetch collector playlists:", error);
         }
@@ -15,11 +16,18 @@ export const useCollectorStore = defineStore("collector", () => {
 
     const addCollectorPlaylist = async (playlistId) => {
         try {
-            const response = await http.get(`/collector/addCollector/2/${playlistId}`);
+            const response = await http.get(`/collector/addCollector/1/${playlistId}`);
         } catch (error) {
             console.error("Failed to fetch collector playlists:", error);
         }
     }
 
-    return { collectorPlaylist, getCollectorPlaylist,addCollectorPlaylist };
+    const addLikeSong = async (songId) => {
+        try {
+            const response = await http.put(`/collector/likeSong/${songId}`);
+        } catch (error) {
+            console.error("Failed to fetch collector playlists:", error);
+        }
+    }
+    return { collectorPlaylist, getCollectorPlaylist,addCollectorPlaylist,addLikeSong };
 });

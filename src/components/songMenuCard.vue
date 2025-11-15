@@ -80,6 +80,7 @@ const handlePlay = () => {
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
 }
 
 .music-card:hover {

@@ -31,6 +31,7 @@
         :key="childComment.id"
         :commentItem="childComment"
         class="childCommentBox"
+        @reply="handleChildReply"
       />
       
       
@@ -44,7 +45,7 @@
           <span v-if="showMore"  @click="showMore= !showMore,Offset=0">收起</span>
         </div>
         <div class="like">like</div>
-        <div class="reply">reply</div>
+        <div class="reply" @click="handleReply">reply</div>
       </div>
     </div>
   </div>
@@ -62,6 +63,21 @@ const props = defineProps({
   },
 })
 
+const emits = defineEmits(['reply'])
+const handleReply = ()=>{
+  console.log(props.commentItem)
+  emits('reply',
+    {
+      username:props.commentItem.username,
+      rootId:props.commentItem.rootId,
+      parentId:props.commentItem.parentId===null? 0:props.commentItem.id,
+    }
+  )
+}
+
+const handleChildReply = (data) => {
+  emits('reply', data)
+}
 const relativeTime = computed(() => {
   const createTime = props.commentItem?.createTime
   if (!createTime) return ''
