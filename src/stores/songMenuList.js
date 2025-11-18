@@ -21,9 +21,9 @@ export const useSongMenuListStore = defineStore("songMenuList", {
   },
   
   actions: {
-    async getAllSongMenuList() {
+    async getAllSongMenuList(force = false) {
       // 避免重复请求
-      // if (this.loading) return;
+      if (this.loading && !force) return;
       
       this.loading = true;
       this.error = null;
@@ -48,9 +48,9 @@ export const useSongMenuListStore = defineStore("songMenuList", {
       }
     },
     
-    async getAllCollectMenuList() {
+    async getAllCollectMenuList(force = false) {
       // 避免重复请求
-      if (this.collectLoading) return;
+      if (this.collectLoading && !force) return;
       
       this.collectLoading = true;
       this.collectError = null;

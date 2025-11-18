@@ -1,24 +1,24 @@
 <template>
-    <div class="songListBox" v-if="!songListStore.loading && playListData">
+    <div class="songListBox" v-if="!songListStore.loading">
         <div class="header">
             <div class="imgBox">
-                <img :src="playListData?.coverUrl || ''" alt="">
+                <img :src="currentSongList?.coverUrl || ''" alt="">
             </div>
             <div class="headerInfo">
                 <div class="titleBox">
-                    <div class="title">{{ playListData?.name || "歌单名字" }}</div>
+                    <div class="title">{{ currentSongList?.name || "歌单名字" }}</div>
                     <div class="subBox">
                         <div class="subImg">
                             <img :src="playlistUserData?.avatarUrl || avatar" alt="">
                         </div>
-                        <div class="subText">{{ playlistUserData?.nickname || "未知用户" }} - {{ playListData?.createTime ||
+                        <div class="subText">{{ playlistUserData?.nickname || "未知用户" }} - {{ currentSongList?.createTime ||
                             "1145-14-13"}}</div>
                     </div>
-                    <div class="desc">{{ songList?.description || "null" }}</div>
+                    <div class="desc">{{ currentSongList?.description || "null" }}</div>
                 </div>
                 <div class="functionBox">
                     <div class="playButton" @click="handlePlayAll()">播放全部</div>
-                    <div v-if="!songListStore.loading && playListData && playListData.userId != userStore.user.id" class="collectButton" @click="handleCollect()">{{ isCollected?"取消收藏":"收藏" }}</div>
+                    <div v-if="!songListStore.loading && currentSongList && currentSongList.userId != userStore.user.id" class="collectButton" @click="handleCollect()">{{ isCollected?"取消收藏":"收藏" }}</div>
                 </div>
             </div>
         </div>
@@ -58,7 +58,7 @@
 import PlaylistSong from '@/components/playList/PlaylistSong.vue'
 import PlaylistComment from '@/components/playList/PlaylistComment.vue'
 import PlaylistCollector from '@/components/playList/PlaylistCollector.vue'
-import { ref, computed, onMounted, watch,onBeforeUpdate } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useSongListStore } from '@/stores/songList'
 import { useSongMenuListStore } from '@/stores/songMenuList'
 import { useRoute } from 'vue-router'
@@ -66,30 +66,22 @@ import { useMusicPlayerStore } from '@/stores/musicPlayer'
 import request from '@/utils/http'
 import avatar from '@/image/avatar.png'
 import { usePlayerStore } from '@/stores/playerList'
-import { useAdminPlaylistStore } from '@/stores/AdminPlaylist'
 import { useCommentStore } from '@/stores/commentStores'
 import { useCollectorStore } from '@/stores/CollectorStore'
 import { useUserStore } from '@/stores/user'
 const userStore = useUserStore()
 const collectorStore = useCollectorStore()
 const commentStore = useCommentStore()
-const adminPlaylistStore = useAdminPlaylistStore()
 const playerStore = usePlayerStore()
 const route = useRoute()
 const songListStore = useSongListStore()
 const songMenuListStore = useSongMenuListStore()
-const songMenuList = computed(() => songMenuListStore.songMenuList)
-const collectMenuList = computed(() => songMenuListStore.collectMenuList)
-const adminPlaylist1 = computed(() => adminPlaylistStore.adminPlaylist1)
 const musicPlayerStore = useMusicPlayerStore()
-const totalList = computed(() => [...collectMenuList.value, ...songMenuList.value, ...adminPlaylist1.value])
+
 const songListId = ref(String(route.params.id))
-const playListData = computed(() => totalList.value.find(item => String(item.id) === songListId.value))
-
-
-const songList = computed(() => songListStore.songList)
 const playlistUserData = ref()
 const isCollected = ref(false)
+
 // 监听路由参数变化
 watch(
   () => route.params.id,
@@ -102,57 +94,33 @@ watch(
   }
 )
 
-const showCollect = ref(false)
-// const playlistData = computed(() => {
-//     // 确保 totalList 和 songListId 都已定义
-//     if (!totalList.value || !songListId.value) {
-//         return {}
-//     }
-//     return totalList.value.find(item => item.id === songListId.value) || {}
-// })
 const loadData = async () => {
   try {
     console.log('开始加载数据，ID:', songListId.value);
-    showCollect.value = false;
-    // 标记开始加载
-    songListStore.loading = true; 
-
-    // 1. 使用Promise.all确保所有列表数据都已获取
-    await Promise.all([
-      songMenuListStore.getAllSongMenuList(),
-      songMenuListStore.getAllCollectMenuList(),
-      adminPlaylistStore.getAdminPlaylistF(1)
-    ]);
+    isCollected.value = false;
     
-    console.log('所有歌单列表数据加载完毕，开始查找当前歌单。totalList:', totalList.value);
+    // 标记开始加载
+    songListStore.loading = true;
 
-    // 2. 在确保totalList完整后，再查找当前歌单数据
-    const playlistData = totalList.value.find(item => item.id == songListId.value); // 注意使用==，因为ID类型可能不同
-    if (!playlistData) {
-      console.error('未在歌单列表中找到ID为', songListId.value, '的歌单');
-      // 可以在这里处理未找到的情况，例如跳转404或显示空状态
-      return;
+    // 1. 并行加载当前歌单的歌曲列表和歌单信息
+    await songListStore.getAllSongList(songListId.value)
+    
+    // 2. 获取歌单创建者信息
+    const currentSongList = songListStore.getCurrentSongList
+    if (currentSongList?.userId) {
+      const res = await request.get(`/playlist/getUserById/${currentSongList.userId}`)
+      playlistUserData.value = res.data;
     }
-    console.log('找到的歌单数据:', playlistData);
-
-    // 3. 并行加载当前歌单的歌曲列表和所属用户信息
-    await Promise.all([
-      songListStore.getAllSongList(songListId.value),
-      playlistData.userId ? request.get(`/playlist/getUserById/${playlistData.userId}`).then(res => {
-        playlistUserData.value = res.data;
-      }) : Promise.resolve()
-    ]);
 
     console.log('歌曲列表和用户数据加载完成');
     // 更新收藏状态
-    isCollected.value = playlistData.isCollect || false;
+    isCollected.value = currentSongList?.isCollect || false;
     
   } catch (error) {
     console.error('数据加载失败:', error);
     // 可以设置一个错误状态，在界面显示错误信息
   } finally {
     songListStore.loading = false;
-    showCollect.value = true;
   }
 }
 
@@ -173,6 +141,10 @@ const formatDuration = (seconds) => {
 
 // tab 相关状态
 const activeTab = ref('1')
+
+// 从store中获取数据
+const songList = computed(() => songListStore.getSongList)
+const currentSongList = computed(() => songListStore.getCurrentSongList)
 
 // tab 数据
 const tabs = computed(() => [

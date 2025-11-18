@@ -20,7 +20,8 @@ export const useAdminPlaylistStore = defineStore("adminPlaylist", {
   
   actions: {
     // 修改获取歌单的方法，添加参数指定存储位置
-    async getAdminPlaylistF(listType = '1') {
+    async getAdminPlaylistF(listType = '1', force = false) {
+      if (this.loading && !force) return;
       this.loading = true;
       this.error = null;
       
