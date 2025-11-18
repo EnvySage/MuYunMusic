@@ -16,6 +16,10 @@ const router = createRouter({
           path: 'songList/:id',
           name: 'songList',
           component: () => import('@/layout/HomePage/view/songList.vue'),
+        },{
+          path: 'userProfile/:id',
+          name: 'userProfile',
+          component: () => import('@/layout/HomePage/view/userProfile.vue'),
         }],
     }
   ],

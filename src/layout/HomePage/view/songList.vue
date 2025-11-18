@@ -1,5 +1,5 @@
 <template>
-    <div class="songListBox">
+    <div class="songListBox" v-if="!songListStore.loading && playListData">
         <div class="header">
             <div class="imgBox">
                 <img :src="playListData?.coverUrl || ''" alt="">
@@ -18,7 +18,7 @@
                 </div>
                 <div class="functionBox">
                     <div class="playButton" @click="handlePlayAll()">播放全部</div>
-                    <div v-if="playListData.userId!=userStore.user.id" class="collectButton" @click="handleCollect()">{{ isCollected?"取消收藏":"收藏" }}</div>
+                    <div v-if="!songListStore.loading && playListData && playListData.userId != userStore.user.id" class="collectButton" @click="handleCollect()">{{ isCollected?"取消收藏":"收藏" }}</div>
                 </div>
             </div>
         </div>
@@ -51,13 +51,14 @@
             </div>
         </div>
     </div>
+    <div v-else class="loading">加载中...</div>
 </template>
 
 <script setup>
 import PlaylistSong from '@/components/playList/PlaylistSong.vue'
 import PlaylistComment from '@/components/playList/PlaylistComment.vue'
 import PlaylistCollector from '@/components/playList/PlaylistCollector.vue'
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch,onBeforeUpdate } from 'vue'
 import { useSongListStore } from '@/stores/songList'
 import { useSongMenuListStore } from '@/stores/songMenuList'
 import { useRoute } from 'vue-router'
@@ -82,8 +83,8 @@ const collectMenuList = computed(() => songMenuListStore.collectMenuList)
 const adminPlaylist1 = computed(() => adminPlaylistStore.adminPlaylist1)
 const musicPlayerStore = useMusicPlayerStore()
 const totalList = computed(() => [...collectMenuList.value, ...songMenuList.value, ...adminPlaylist1.value])
-const songListId = ref(route.params.id)
-const playListData = computed(() => totalList.value.find(item => item.id === songListId.value))
+const songListId = ref(String(route.params.id))
+const playListData = computed(() => totalList.value.find(item => String(item.id) === songListId.value))
 
 
 const songList = computed(() => songListStore.songList)
@@ -91,43 +92,74 @@ const playlistUserData = ref()
 const isCollected = ref(false)
 // 监听路由参数变化
 watch(
-    () => route.params.id,
-    (newId, oldId) => {
-        console.log('路由ID变化:', oldId, '->', newId)
-        if (newId && newId !== oldId) {
-            songListId.value = newId
-            loadData()
-        }
+  () => route.params.id,
+  async (newId, oldId) => {
+    console.log('路由ID变化:', oldId, '->', newId)
+    if (newId && newId !== oldId) {
+      songListId.value = String(newId)
+      await loadData()
     }
+  }
 )
 
-// 数据加载函数
+const showCollect = ref(false)
+// const playlistData = computed(() => {
+//     // 确保 totalList 和 songListId 都已定义
+//     if (!totalList.value || !songListId.value) {
+//         return {}
+//     }
+//     return totalList.value.find(item => item.id === songListId.value) || {}
+// })
 const loadData = async () => {
-    try {
-        console.log('开始加载数据，ID:', songListId.value)
-        
-        await songListStore.getAllSongList(songListId.value)
-        console.log('歌曲列表加载完成:', songList.value)
-        
-        // 加载用户数据
-        const playlistData = totalList.value.find(item => item.id === songListId.value)
-        console.log('找到的歌单数据:', playlistData)
-        
-        if (playlistData && playlistData.userId) {
-            const res = await request.get(`/playlist/getUserById/${playlistData.userId}`)
-            playlistUserData.value = res.data
-            console.log('用户数据加载完成:', playlistUserData.value)
-        }
-        isCollected.value=playListData.value.isCollect
-    } catch (error) {
-        console.error('数据加载失败:', error)
-        playlistUserData.value = null
+  try {
+    console.log('开始加载数据，ID:', songListId.value);
+    showCollect.value = false;
+    // 标记开始加载
+    songListStore.loading = true; 
+
+    // 1. 使用Promise.all确保所有列表数据都已获取
+    await Promise.all([
+      songMenuListStore.getAllSongMenuList(),
+      songMenuListStore.getAllCollectMenuList(),
+      adminPlaylistStore.getAdminPlaylistF(1)
+    ]);
+    
+    console.log('所有歌单列表数据加载完毕，开始查找当前歌单。totalList:', totalList.value);
+
+    // 2. 在确保totalList完整后，再查找当前歌单数据
+    const playlistData = totalList.value.find(item => item.id == songListId.value); // 注意使用==，因为ID类型可能不同
+    if (!playlistData) {
+      console.error('未在歌单列表中找到ID为', songListId.value, '的歌单');
+      // 可以在这里处理未找到的情况，例如跳转404或显示空状态
+      return;
     }
+    console.log('找到的歌单数据:', playlistData);
+
+    // 3. 并行加载当前歌单的歌曲列表和所属用户信息
+    await Promise.all([
+      songListStore.getAllSongList(songListId.value),
+      playlistData.userId ? request.get(`/playlist/getUserById/${playlistData.userId}`).then(res => {
+        playlistUserData.value = res.data;
+      }) : Promise.resolve()
+    ]);
+
+    console.log('歌曲列表和用户数据加载完成');
+    // 更新收藏状态
+    isCollected.value = playlistData.isCollect || false;
+    
+  } catch (error) {
+    console.error('数据加载失败:', error);
+    // 可以设置一个错误状态，在界面显示错误信息
+  } finally {
+    songListStore.loading = false;
+    showCollect.value = true;
+  }
 }
 
 // 初始化加载
-onMounted(() => {
-    loadData()
+onMounted(async () => {
+    // 确保必要的数据已加载
+    await loadData()
 })
 
 const formatDuration = (seconds) => {

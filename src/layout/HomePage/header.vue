@@ -4,7 +4,7 @@
             <div class="left">
                 <div class="header-logo iconfont icon-wangyiyunyinle1" @click="goToIndex"></div>
                 <div class="header-search">
-                    <div class="search-back iconfont icon-down" @click="backPreview"></div>
+                    <div class="search-back iconfont icon-down" @click="backPreview" style="transform: rotate(90deg);"></div>
                     <div class="search-input">
                         <div class="iconfont icon-sousuosearch"></div>
                         <input type="text" placeholder="搜索音乐、歌单、专辑" />
@@ -15,7 +15,7 @@
                 </div>
             </div>
             <div class="right">
-                <div class="header-user_bucket" @click="handleLogin">
+                <div class="header-user_bucket" @click="UserPage">
                     <div class="user_logo">
                         <img :src="user.avatarUrl" alt="用户图片" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                     </div>
@@ -24,7 +24,7 @@
                 </div>
                 <div class="header-user_function">
                     <div class="iconfont icon-youjian1"></div>
-                    <div class="iconfont icon-shezhi"></div>
+                    <div class="iconfont icon-shezhi" @click="handleLogin"></div>
                     <div class="iconfont icon-gexinghua" @click="toggleTheme"></div>
                 </div>
             </div>
@@ -66,6 +66,10 @@ const backPreview = () => {
 const toggleTheme = () => {
     themeStore.toggleTheme();
 }
+
+ const UserPage = () => {
+    router.push('/userProfile/' + userStore.user.id);
+ }
 </script>
 
 <style lang="scss" scoped>

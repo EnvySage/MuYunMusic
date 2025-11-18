@@ -9,7 +9,7 @@ import '@/style/main.css'
 
 const app = createApp(App)
 const pinia = createPinia()
-pinia.use(persist)
+// pinia.use(persist)
 
 app.use(pinia)
 app.use(router)

@@ -32,7 +32,7 @@
           <Sider></Sider>
         </el-splitter-panel>
         <el-splitter-panel :min="800" class="content-panel">
-          <router-view></router-view>
+          <router-view :key="$route.fullPath" />
         </el-splitter-panel>
       </el-splitter>
     </div>

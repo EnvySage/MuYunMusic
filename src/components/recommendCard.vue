@@ -43,7 +43,6 @@ const handleClick = () => {
 .recommend-card {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;
   border-radius: var(--border-radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-sm);

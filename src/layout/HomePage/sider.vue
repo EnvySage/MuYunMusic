@@ -213,7 +213,6 @@ const toggleCollectedMenu = () => {
 .own {
   display: flex;
   flex-direction: column;
-  padding: var(--spacing-md) 0;
   gap: var(--spacing-xs);
   margin-bottom: var(--spacing-md);
 
@@ -268,7 +267,6 @@ const toggleCollectedMenu = () => {
 .song-menu {
   display: flex;
   flex-direction: column;
-  padding: var(--spacing-md) 0;
   gap: var(--spacing-xs);
   margin-top: var(--spacing-md);
   border-top: 1px solid var(--border-color-light);

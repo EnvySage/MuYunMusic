@@ -23,7 +23,7 @@ export const useSongMenuListStore = defineStore("songMenuList", {
   actions: {
     async getAllSongMenuList() {
       // 避免重复请求
-      if (this.loading) return;
+      // if (this.loading) return;
       
       this.loading = true;
       this.error = null;

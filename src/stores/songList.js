@@ -30,7 +30,6 @@ export const useSongListStore = defineStore("songList", {
         this.loading = false;
       }
     },
-    
     setSongList(songList) {
       this.songList = songList;
     },
