@@ -112,7 +112,7 @@ const loadData = async () => {
       playlistUserData.value = res.data;
     }
 
-    console.log('歌曲列表和用户数据加载完成');
+    console.log('歌曲列表和用户数据加载完成==========',currentSongList);
     // 更新收藏状态
     isCollected.value = currentSongList?.isCollect || false;
     
@@ -192,7 +192,6 @@ const handlePlayAll = () => {
         musicPlayerStore.togglePlay()
     }, 100)
 }
-// 处理收藏
 
 // 创建一个防抖定时器引用
 const collectDebounceTimer = ref(null)

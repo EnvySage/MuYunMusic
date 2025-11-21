@@ -261,11 +261,11 @@ watch(() => musicPlayerStore.audioElement, (newAudioElement) => {
         flex-wrap: nowrap;
 
         img {
-            width: 56px;
-            height: 56px;
+            width: 70px;
+            height: 70px;
             object-fit: cover;
             border-radius: var(--border-radius-round);
-            box-shadow: var(--shadow-sm);
+            box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2);
             cursor: pointer;
             transition: var(--transition-all);
             animation: rotateAlbum 20s linear infinite;
@@ -290,7 +290,7 @@ watch(() => musicPlayerStore.audioElement, (newAudioElement) => {
         .album {
             display: flex;
             flex-direction: column;
-            gap: var(--spacing-md);
+            gap: var(--spacing-xs);
 
             .albumInfo {
                 display: flex;

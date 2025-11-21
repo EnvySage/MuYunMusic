@@ -168,6 +168,7 @@ const adjustLyricOffset = (delta) => {
 
 <template>
   <div class="LyricBox" :style="{ backgroundImage: `url(${musicPlayerStore.currentSong.cover})` }">
+    <div class="overplay"></div>
     <div class="playerHeader">
       <div class="iconfont icon-fanhui" @click="lyricStore.hideLyricPage()"></div>
     </div>
@@ -245,12 +246,23 @@ const adjustLyricOffset = (delta) => {
     }
   }
 }
+.overplay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* 黑色半透明遮罩，透明度可调整 */
+  z-index: 1;
+}
 .SongBox {
   display: flex;
   width: 100%;
   height: 100vh;
   align-items: center;
   backdrop-filter: blur(1000px);
+  position: relative;
+  z-index: 2;
   .albumBox{
     width: 50%;
     .album-cover {
