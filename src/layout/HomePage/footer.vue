@@ -326,7 +326,7 @@ watch(() => musicPlayerStore.audioElement, (newAudioElement) => {
 
                 .iconfont {
                     font-size: var(--icon-size-md);
-                    color: var(--text-color-light);
+                    color: black;
                     cursor: pointer;
                     transition: var(--transition-all);
                     padding: var(--spacing-xs);
@@ -340,7 +340,7 @@ watch(() => musicPlayerStore.audioElement, (newAudioElement) => {
 
                 .time-text {
                     font-size: var(--font-size-xs);
-                    color: var(--text-color-lighter);
+                    color: black;
                     white-space: nowrap;
                 }
             }

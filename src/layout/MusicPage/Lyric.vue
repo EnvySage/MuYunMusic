@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import Lyric from 'lyric-parser'
 import { useMusicPlayerStore } from '@/stores/musicPlayer'
 import { useLyricStore } from '@/stores/lyric'
 
@@ -15,65 +16,76 @@ onMounted(() => {
 const lrcText = computed(() => musicPlayerStore.lyricText)
 
 const parseLRC = (lrcText) => {
+  if (!lrcText) return [];
+
+  try {
+    const parser = new Lyric(lrcText);
+    parser.parse();
+    
+    // 过滤无效时间戳并确保时间有效性
+    const validLines = parser.lines.filter(line => 
+      typeof line.time === 'number' && 
+      !isNaN(line.time) && 
+      line.time >= 0
+    );
+
+    if (validLines.length === 0) {
+      console.warn('No valid lyric lines found, falling back to manual parse');
+      return manualParseLRC(lrcText);
+    }
+
+    // 按时间分组（严格时间接近度匹配）
+    const groups = [];
+    let currentGroup = [validLines[0]];
+
+    for (let i = 1; i < validLines.length; i++) {
+      const prevLine = validLines[i - 1];
+      const currentLine = validLines[i];
+      
+      if (Math.abs(currentLine.time - prevLine.time) < 0.1) {
+        currentGroup.push(currentLine);
+      } else {
+        groups.push(currentGroup);
+        currentGroup = [currentLine];
+      }
+    }
+    groups.push(currentGroup);
+
+    // 处理每个分组（确保至少包含原始文本）
+    return groups.map(group => ({
+      time: group[0].time + musicPlayerStore.lyricOffset,
+      originalTime: group[0].time,
+      original: group[0].text || '',
+      translation: group.length > 1 ? group[1].text || '' : ''
+    })).sort((a, b) => a.time - b.time);
+  } catch (e) {
+    console.error('Error parsing lyrics with lyric-parser:', e);
+    return manualParseLRC(lrcText);
+  }
+};
+
+// 手动解析回退方案
+const manualParseLRC = (lrcText) => {
   const lines = lrcText.split('\n').filter(line => line.trim() !== '');
   const lyrics = [];
-
   const timeRegex = /\[(\d+):(\d+)\.(\d+)\]/;
 
-  let buffer = []; // 用于暂存同一时间或相邻时间的歌词行
-
-  lines.forEach((rawLine, index) => {
+  lines.forEach(rawLine => {
     const line = rawLine.trim();
-    if (!line) return;
-
     const timeMatch = line.match(timeRegex);
-    let currentTime = null;
-    let text = line;
-
+    
     if (timeMatch) {
       const minutes = parseInt(timeMatch[1]);
       const seconds = parseInt(timeMatch[2]);
       const milliseconds = parseInt(timeMatch[3]);
-      currentTime = (minutes * 60) + seconds + (milliseconds / 1000);
-      text = line.replace(timeRegex, '').trim();
-    }
-
-    const isJapanese = text ? /[\u3040-\u309F\u30A0-\u30FF\uFF65-\uFF9F]/.test(text) : false;
-
-    const entry = {
-      time: currentTime,
-      text,
-      isJapanese,
-      raw: rawLine,
-      index
-    };
-
-    buffer.push(entry);
-
-    // 尝试配对：查找当前 buffer 中是否有可以配对的日文和中文
-    for (let i = 0; i < buffer.length - 1; i++) {
-      const first = buffer[i];
-      const second = buffer[i + 1];
-
-      // 两者都有时间，且时间相等或非常接近，且一个是日文，一个是中文
-      if (
-        first.time !== null &&
-        second.time !== null &&
-        Math.abs(first.time - second.time) < 0.1 && // 允许微小误差
-        first.isJapanese !== second.isJapanese && // 语言不同
-        first.text && second.text // 有实际文本
-      ) {
-        lyrics.push({
-          time: first.time + musicPlayerStore.lyricOffset, // 假设有 offset
-          originalTime: first.time,
-          japanese: first.isJapanese ? first.text : second.isJapanese ? second.text : '',
-          chinese: first.isJapanese ? second.text : second.isJapanese ? first.text : ''
-        });
-
-        // 移除已配对的条目
-        buffer.splice(i, 2);
-        break; // 一次只配对一对
-      }
+      const time = (minutes * 60) + seconds + (milliseconds / 1000);
+      
+      lyrics.push({
+        time: time + musicPlayerStore.lyricOffset,
+        originalTime: time,
+        original: line.replace(timeRegex, '').trim(),
+        translation: ''
+      });
     }
   });
 
@@ -91,10 +103,9 @@ const formatTime = (seconds) => {
 const findCurrentLyricIndex = (lyrics, currentTime) => {
   if (!lyrics.length) return -1;
   
-  // 添加0.1秒の提前量，使歌词显示更自然
-  const adjustedTime = currentTime + 0.1
+  // 移除提前量，使用精确时间比对
+  const adjustedTime = currentTime;
   
-  // 使用二分查找提高性能
   let low = 0;
   let high = lyrics.length - 1;
   
@@ -201,10 +212,10 @@ const adjustLyricOffset = (delta) => {
                 'after-active': index > currentLyricIndex && index <= currentLyricIndex + 3
               }"
             >
-              <!-- <div class="time-tag">{{ formatTime(line.originalTime) }}</div> -->
+              <div class="time-tag">{{ formatTime(line.originalTime) }}</div>
               <div>
-                <div class="japanese-lyric">{{ line.japanese }}</div>
-                <div class="chinese-lyric">{{ line.chinese }}</div>
+                <div class="original-lyric">{{ line.original }}</div>
+                <div class="translation-lyric">{{ line.translation }}</div>
               </div>
             </div>
           </div>
@@ -349,12 +360,12 @@ const adjustLyricOffset = (delta) => {
 
 .lyric-line.active {
   opacity: 1;
-  color: #ff3e3e;
   font-size: 30px;
   font-weight: bold;
   margin: 15px 0;
   transform: translateY(0);
-  text-shadow: 0 0 10px rgba(255, 62, 62, 0.5);
+  border-radius: 4px;
+  padding: 5px 10px;
 }
 
 .lyric-line.after-active {
@@ -363,24 +374,23 @@ const adjustLyricOffset = (delta) => {
   transform: translateY(0);
 } 
 
-.japanese-lyric {
+.original-lyric {
   margin-bottom: 5px;
   transition: all 0.3s ease;
 }
 
-.chinese-lyric {
+.translation-lyric {
   color: rgba(255, 255, 255, 0.7);
   font-size: 14px;
   transition: all 0.3s ease;
 }
 
-.lyric-line.active .japanese-lyric {
+.lyric-line.active .original-lyric,
+.lyric-line.active .translation-lyric {
   font-size: 1.2em;
-}
-
-.lyric-line.active .chinese-lyric {
-  font-size: 1.1em;
-  color: rgba(255, 255, 255, 0.9);
+  color: #ff3e3e;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(255, 62, 62, 0.5);
 }
 
 .player-controls {

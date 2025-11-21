@@ -89,6 +89,9 @@ export const useMusicPlayerStore = defineStore('musicPlayer', () => {
       ...currentSong.value,
       ...song
     };
+    if(song.id){
+      setLyricText(song.id);
+    }
     
     // 等待 DOM 更新后重新开始播放
     setTimeout(() => {
