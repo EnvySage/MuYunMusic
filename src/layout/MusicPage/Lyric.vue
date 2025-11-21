@@ -34,22 +34,26 @@ const parseLRC = (lrcText) => {
       return manualParseLRC(lrcText);
     }
 
-    // 按时间分组（严格时间接近度匹配）
+    // 按时间分组（基于当前组最后一行比较）
     const groups = [];
-    let currentGroup = [validLines[0]];
+    let currentGroup = [];
 
-    for (let i = 1; i < validLines.length; i++) {
-      const prevLine = validLines[i - 1];
-      const currentLine = validLines[i];
-      
-      if (Math.abs(currentLine.time - prevLine.time) < 0.1) {
-        currentGroup.push(currentLine);
+    for (const line of validLines) {
+      if (currentGroup.length === 0) {
+        currentGroup.push(line);
       } else {
-        groups.push(currentGroup);
-        currentGroup = [currentLine];
+        const lastTime = currentGroup[currentGroup.length - 1].time;
+        if (Math.abs(line.time - lastTime) < 0.1) {
+          currentGroup.push(line);
+        } else {
+          groups.push(currentGroup);
+          currentGroup = [line];
+        }
       }
     }
-    groups.push(currentGroup);
+    if (currentGroup.length > 0) {
+      groups.push(currentGroup);
+    }
 
     // 处理每个分组（确保至少包含原始文本）
     return groups.map(group => ({
@@ -68,30 +72,61 @@ const parseLRC = (lrcText) => {
 const manualParseLRC = (lrcText) => {
   const lines = lrcText.split('\n').filter(line => line.trim() !== '');
   const lyrics = [];
-  const timeRegex = /\[(\d+):(\d+)\.(\d+)\]/;
+  const timeRegex = /\[(\d+):(\d+)\.(\d+)\]/g; // 注意这里的 'g' 标志，用于匹配一行中的多个时间戳
+
+  let currentTime = null;
+  let currentOriginal = '';
+  let currentTranslation = '';
 
   lines.forEach(rawLine => {
     const line = rawLine.trim();
-    const timeMatch = line.match(timeRegex);
-    
-    if (timeMatch) {
-      const minutes = parseInt(timeMatch[1]);
-      const seconds = parseInt(timeMatch[2]);
-      const milliseconds = parseInt(timeMatch[3]);
+    const timeMatches = [...line.matchAll(timeRegex)]; // 获取一行中所有的时间戳匹配结果
+
+    if (timeMatches.length > 0) {
+      // 计算时间（以第一个时间戳为准）
+      const firstMatch = timeMatches[0];
+      const minutes = parseInt(firstMatch[1]);
+      const seconds = parseInt(firstMatch[2]);
+      const milliseconds = parseInt(firstMatch[3]);
       const time = (minutes * 60) + seconds + (milliseconds / 1000);
-      
-      lyrics.push({
-        time: time + musicPlayerStore.lyricOffset,
-        originalTime: time,
-        original: line.replace(timeRegex, '').trim(),
-        translation: ''
-      });
+
+      const text = line.replace(timeRegex, '').trim(); // 移除所有时间戳后得到纯文本
+
+      // 如果当前时间点没有记录原文，则将此行作为原文
+      // 如果当前时间点已记录原文，则将此行作为翻译
+      if (currentTime === null || Math.abs(time - currentTime) > 0.01) {
+        // 遇到新时间点，将前一个分组保存（如果有的话）
+        if (currentTime !== null) {
+          lyrics.push({
+            time: currentTime + musicPlayerStore.lyricOffset,
+            originalTime: currentTime,
+            original: currentOriginal,
+            translation: currentTranslation
+          });
+        }
+        // 开始新的分组
+        currentTime = time;
+        currentOriginal = text;
+        currentTranslation = '';
+      } else {
+        // 与当前时间点相同或非常接近，视为翻译行
+        currentTranslation = text;
+      }
     }
   });
 
+  // 循环结束后，添加最后一个分组
+  if (currentTime !== null) {
+    lyrics.push({
+      time: currentTime + musicPlayerStore.lyricOffset,
+      originalTime: currentTime,
+      original: currentOriginal,
+      translation: currentTranslation
+    });
+  }
+
   return lyrics.sort((a, b) => a.time - b.time);
 };
-
 // 格式化时间
 const formatTime = (seconds) => {
   const mins = Math.floor(seconds / 60)
@@ -200,7 +235,6 @@ const adjustLyricOffset = (delta) => {
               <button @click="adjustLyricOffset(0.1)">+0.1s</button>
             </div>
           </div>
-  
           <div class="lyrics-container">
             <div 
               v-for="(line, index) in parsedLyrics" 
