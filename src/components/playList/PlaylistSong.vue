@@ -1,6 +1,6 @@
 <template>
   <div class="table-container">
-    <el-table :data="songs" style="width: 100%" :show-header="false" row-class-name="song-table-row"
+    <el-table :data="songs" style="width: 100%" :show-header="true" row-class-name="song-table-row"
       @row-click="handleRowClick">
       <el-table-column prop="index" label="" width="40">
         <template #default="scope">
@@ -13,17 +13,26 @@
         <template #default="scope">
           <div class="song-info" style="display: flex; align-items: center; gap: 10px;">
             <div class="album-cover" style="width: 40px; height: 40px; flex-shrink: 0;">
-              <img :src="scope.row.coverUrl" alt="专辑封面" style="width: 100%; height: 100%; object-fit: cover; border-radius: 5px;">
+              <img :src="scope.row.coverUrl" alt="专辑封面"
+                style="width: 100%; height: 100%; object-fit: cover; border-radius: 5px;">
             </div>
             <div class="song-details" style="display: flex; flex-direction: column;">
-              <span class="song-title" :class="{ 'playing': isCurrentSong(scope.row) }" style="font-weight: bolder; font-size: larger;">{{ scope.row?.name || ""}}</span>
-              <span class="singer" style="font-weight: bolder; font-size: larger;">{{ scope.row?.artistName || ""}}</span>
+              <span class="song-title" :class="{ 'playing': isCurrentSong(scope.row) }"
+                style="font-weight: bolder; font-size: larger;">{{ scope.row?.name || "" }}</span>
+              <span class="singer" style="font-weight: bolder; font-size: larger;">{{ scope.row?.artistName ||
+                ""}}</span>
             </div>
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="albumName" label="专辑" min-width="150" />
-      <el-table-column label="收藏" width="60" align="center">
+      <el-table-column prop="albumName" label="专辑" min-width="150">
+        <template #default="scope">
+          <div class="album-cell">
+            {{ scope.row.album }}
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="喜欢" width="60" align="center">
         <template #default="scope">
           <div class="like-cell" @click.stop="handleLike(scope.row)">
             <div class="iconfont" :class="scope.row.like ? 'icon-xihuan' : 'icon-dianzan-xiankuang'"
@@ -31,6 +40,15 @@
           </div>
         </template>
       </el-table-column>
+      <el-table-column label="收藏" width="60" align="center">
+        <template #default="scope">
+          <div class="collect-cell" @click.stop="handleCollect(scope.row)">
+            <div class="iconfont icon-shoucang1"
+              style="font-size: 20px; cursor: pointer;"></div>
+          </div>
+        </template>
+      </el-table-column>
+
       <el-table-column prop="duration" label="时长" width="80" align="center">
         <template #default="scope">
           <div class="duration-cell">
@@ -47,6 +65,8 @@ import { ref, computed } from 'vue'
 import { useSongListStore } from '@/stores/songList'
 import { useCollectorStore } from '@/stores/CollectorStore'
 import { useMusicPlayerStore } from '@/stores/musicPlayer'
+import { useComponentStatusStore } from '@/stores/componentStatus'
+const componentStatusStore = useComponentStatusStore()
 const songListStore = useSongListStore()
 const collectorStore = useCollectorStore()
 const musicPlayerStore = useMusicPlayerStore()
@@ -55,19 +75,19 @@ const props = defineProps({
     type: Array,
     required: true
   },
-  playlistId:{
-    type:String,
-    required:true
+  playlistId: {
+    type: String,
+    required: true
   }
 })
 const emits = defineEmits(['row-click'])
 
 const formatDuration = (seconds) => {
   if (!seconds || seconds <= 0) return '0:00'
-  
+
   const minutes = Math.floor(seconds / 60)
   const remainingSeconds = Math.floor(seconds % 60)
-  
+
   return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
 }
 
@@ -81,13 +101,23 @@ const isCurrentSong = (row) => {
 }
 
 // 处理喜欢/取消喜欢
-const handleLike = async(row) => {
+const handleLike = async (row) => {
   await collectorStore.addLikeSong(row.id)
   songListStore.getAllSongList(props.playlistId)
   // 同步更新当前播放歌曲的收藏状态
   if (musicPlayerStore.currentSong.id === row.id) {
     musicPlayerStore.setCurrentSongLike(!row.like)
   }
+}
+// 处理收藏
+const handleCollect = (song) =>{
+    collectorStore.currentSong.push(song);
+
+    if(!componentStatusStore.CollectComponent){
+        componentStatusStore.showCollectComponent();
+    }else{
+        componentStatusStore.hideCollectComponent();
+    }
 }
 </script>
 
@@ -134,12 +164,12 @@ const handleLike = async(row) => {
     font-weight: var(--font-weight-bold);
     margin-bottom: 4px;
     color: var(--text-color);
-    
+
     &.playing {
       color: var(--primary-color);
     }
   }
-  
+
   .singer {
     font-size: var(--font-size-sm);
     color: var(--text-color-light);
@@ -150,11 +180,11 @@ const handleLike = async(row) => {
   .iconfont {
     color: var(--text-color-light);
     transition: all 0.3s ease;
-    
+
     &.icon-xihuan {
       color: var(--primary-color);
     }
-    
+
     &:hover {
       transform: scale(1.1);
     }

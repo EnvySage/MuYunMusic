@@ -199,7 +199,6 @@ const toggleCollectedMenu = () => {
   padding: var(--spacing-md);
   overflow-y: auto;
   overflow-x: hidden;
-
   .common {
     display: flex;
     flex-direction: column;

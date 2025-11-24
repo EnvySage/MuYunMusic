@@ -1,5 +1,6 @@
 // src/stores/songList.js
 import { defineStore } from "pinia";
+import { ElMessage } from "element-plus";
 import request from "@/utils/http";
 export const useSongListStore = defineStore("songList", {
   state: () => ({
@@ -36,6 +37,19 @@ export const useSongListStore = defineStore("songList", {
     clearSongList() {
       this.songList = [];
       this.currentSongList = null;
+    },
+
+    async deleteCurrentSongList(playlistId) {
+      try {
+        const response = await request.delete(`/playlist/deletePlaylist/${playlistId}`);
+        if (response.success) {
+          // this.currentSongList = this.songList[0]
+          ElMessage.success("删除歌单成功");
+        }
+      } catch (error) {
+        console.error("删除歌单失败:", error);
+        throw error;
+      }
     }
   },
 });

@@ -35,9 +35,9 @@ export const useSongMenuListStore = defineStore("songMenuList", {
         }
         
         const userId = userStore.user.id;
-        console.log(userId + "获取歌单列表成功");
         const response = await request.get("/playlist/getAll", { userId: userId });
         this.songMenuList = response.data || [];
+        console.log(userId + "获取歌单列表成功songMenuList", this.songMenuList);
         return this.songMenuList;
       } catch (error) {
         this.error = error.message || '获取歌单列表失败';

@@ -20,7 +20,6 @@ http.interceptors.request.use(
     if (userStore.user.token) {
       config.headers.Authorization = `Bearer ${userStore.user.token}`
     }
-    console.log('请求头:', config.headers)
     
     // 处理请求数据中的ID字段，转换为字符串避免精度丢失
     if (config.data) {

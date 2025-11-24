@@ -15,7 +15,7 @@
                     <div class="albumAuthor">{{ musicPlayerStore.currentSong.artist }}</div>
                 </div>
                 <div class="albumFunction" :style="{ 'filter': lyricStore.lyricPage ? 'invert(100%)' : 'invert(0%)' }">
-                    <div class="iconfont icon-shoucang1"></div>
+                    <div class="iconfont icon-shoucang1" @click="handleCollect(musicPlayerStore.currentSong)"></div>
                     <div class="iconfont icon-pinglun"></div>
                     <div class="iconfont icon-fenxiang"></div>
                     <div class="iconfont icon-xiazai"></div>
@@ -66,9 +66,13 @@ import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useMusicPlayerStore } from '@/stores/musicPlayer'
 import { useLyricStore } from '@/stores/lyric'
 import { usePlayerStore } from '@/stores/playerList'
+import { useCollectorStore } from '@/stores/CollectorStore'
+import { useComponentStatusStore } from '@/stores/componentStatus'
+const componentStatusStore = useComponentStatusStore()
 const musicPlayerStore = useMusicPlayerStore()
 const lyricStore = useLyricStore()
 const playerStore = usePlayerStore()
+const collectStore = useCollectorStore()
 // 音量控制相关
 const showVolumePanel = ref(false)
 const volumeValue = ref(musicPlayerStore.volume * 100)
@@ -190,6 +194,16 @@ watch(() => musicPlayerStore.audioElement, (newAudioElement) => {
     }
 }, { immediate: true })
 
+
+const handleCollect = (song) =>{
+    collectStore.currentSong.push(song);
+
+    if(!componentStatusStore.CollectComponent){
+        componentStatusStore.showCollectComponent();
+    }else{
+        componentStatusStore.hideCollectComponent();
+    }
+}
 </script>
 
 <style lang="scss" scoped>

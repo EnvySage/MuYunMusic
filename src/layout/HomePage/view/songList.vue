@@ -19,6 +19,7 @@
                 <div class="functionBox">
                     <div class="playButton" @click="handlePlayAll()">播放全部</div>
                     <div v-if="!songListStore.loading && currentSongList && currentSongList.userId != userStore.user.id" class="collectButton" @click="handleCollect()">{{ isCollected?"取消收藏":"收藏" }}</div>
+                    <div v-else class="deleteButton" @click="handleDelete()">删除歌单</div>
                 </div>
             </div>
         </div>
@@ -69,6 +70,9 @@ import { usePlayerStore } from '@/stores/playerList'
 import { useCommentStore } from '@/stores/commentStores'
 import { useCollectorStore } from '@/stores/CollectorStore'
 import { useUserStore } from '@/stores/user'
+import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
+const router = useRouter()
 const userStore = useUserStore()
 const collectorStore = useCollectorStore()
 const commentStore = useCommentStore()
@@ -220,6 +224,21 @@ const handleCollect = () => {
         }
     }, 2000) // 1秒防抖延迟，你可以根据需要调整时间
 }
+const handleDelete = async () => {
+    try {
+        await songListStore.deleteCurrentSongList(songListId.value)
+        // 删除成功后，跳转到创建的歌单列表的第一个
+        await songMenuListStore.getAllSongMenuList()
+        if (songMenuListStore.songMenuList && songMenuListStore.songMenuList.length > 0) {
+            router.push('/songList/' + songMenuListStore.songMenuList[0].id)
+        } else {
+            // 如果没有创建的歌单，则跳转到首页或其他默认页面
+            router.push('/')
+        }
+    } catch (error) {
+        console.error('删除歌单失败:', error)
+    }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -228,9 +247,9 @@ const handleCollect = () => {
     display: flex;
     flex-direction: column;
     position: relative;
-    padding: 20px 20px;
+    padding: 40px 100px;
     background-color: var(--background-color-white);
-
+    gap: 30px;
     .header {
         width: 100%;
         display: flex;
@@ -301,6 +320,7 @@ const handleCollect = () => {
                 gap: 10px;
 
                 .playButton,
+                .deleteButton,
                 .collectButton {
                     padding: 20px;
                     height: 40px;
@@ -312,7 +332,7 @@ const handleCollect = () => {
                     align-items: center;
                 }
 
-                .collectButton {
+                .collectButton, .deleteButton {
                     background-color: var(--button-color);
                     color: var(--text-color-white);
                 }

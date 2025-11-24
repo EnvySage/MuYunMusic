@@ -3,6 +3,10 @@
     <div class="loginBox">
       <login></login>
     </div>
+    <div class="collect">
+      <collectModel></collectModel>
+      <createPlaylistModel></createPlaylistModel>
+    </div>
     <div class="playerListControll">
       <el-drawer v-model="playerStore.player" lock-scroll direction="rtl" :show-close="false">
         <template #header="{ close, titleId, titleClass }">
@@ -60,6 +64,8 @@ import Footer from './footer.vue';
 import Lyric from '@/layout/MusicPage/Lyric.vue'
 import playListItem from '@/components/playListItem.vue';
 import login from '@/components/login.vue';
+import collectModel from '@/components/collectModel.vue';
+import createPlaylistModel from '@/components/createPlaylistModel.vue';
 const lyricStore = useLyricStore()
 const musicPlayerStore = useMusicPlayerStore()
 const playerStore = usePlayerStore()
@@ -182,6 +188,73 @@ import albumCover from '../../image/Music/晚餐歌.jpg'
   min-height: 0; // 关键修复：防止 Flex 容器溢出
   overflow-y: hidden;
 
+  // 左侧面板（侧边栏）滚动条样式
+  :deep(.sider-panel) {
+    overflow-y: hidden;
+    
+    & > div {
+      overflow-y: auto;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE/Edge */
+      
+      &::-webkit-scrollbar {
+        width: 0;
+        background: transparent;
+      }
+      
+      &:hover::-webkit-scrollbar {
+        width: 8px;
+      }
+      
+      &:hover::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      
+      &:hover::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+        transition: background-color 0.3s;
+      }
+      
+      &:hover::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+    }
+  }
+  
+  // 右侧面板（内容区）滚动条样式
+  :deep(.content-panel) {
+    overflow-y: hidden;
+    
+    & > div {
+      overflow-y: auto;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE/Edge */
+      
+      &::-webkit-scrollbar {
+        width: 0;
+        background: transparent;
+      }
+      
+      &:hover::-webkit-scrollbar {
+        width: 8px;
+      }
+      
+      &:hover::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      
+      &:hover::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+        transition: background-color 0.3s;
+      }
+      
+      &:hover::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+    }
+  }
 }
 
 .content-panel {

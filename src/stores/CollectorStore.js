@@ -29,5 +29,22 @@ export const useCollectorStore = defineStore("collector", () => {
             console.error("Failed to fetch collector playlists:", error);
         }
     }
-    return { collectorPlaylist, getCollectorPlaylist,addCollectorPlaylist,addLikeSong };
+    
+    
+    //处理添加歌曲到收藏歌单的逻辑
+    const currentSong = ref([]);// 当前要添加的歌曲
+    const addSongToCollectorPlaylist = async (IdList) => { //idList[{playlistId,songId}]
+        //去除相同的歌曲
+        IdList = IdList.filter((item, index, self) => {
+            return self.findIndex(i => i.songId === item.songId) === index;
+        });
+        try {
+            const res = await http.post('/playlist/add',IdList)
+            return res;
+        }catch (error) {
+            console.error("Failed to fetch collector playlists:", error);
+            return error;
+        }
+    };
+    return { collectorPlaylist, getCollectorPlaylist,addCollectorPlaylist,addLikeSong,currentSong, addSongToCollectorPlaylist };
 });
