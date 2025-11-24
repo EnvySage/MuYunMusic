@@ -1,12 +1,14 @@
 <template>
-    <div class="songListBox" v-if="!songListStore.loading">
+    <div class="songListBox" v-if="!songListStore.loading" v-show="songListShow">
         <div class="header">
             <div class="imgBox">
-                <img :src="currentSongList?.coverUrl || ''" alt="">
+                <img :src="currentSongList?.coverUrl || avatar" alt="">
             </div>
             <div class="headerInfo">
                 <div class="titleBox">
-                    <div class="title">{{ currentSongList?.name || "歌单名字" }}</div>
+                    <div class="title">{{ currentSongList?.name || "歌单名字" }}
+                        <el-icon @click="handlePlaylistEdit()"><Edit /></el-icon>
+                    </div>
                     <div class="subBox">
                         <div class="subImg">
                             <img :src="playlistUserData?.avatarUrl || avatar" alt="">
@@ -53,12 +55,14 @@
         </div>
     </div>
     <div v-else class="loading">加载中...</div>
+    <playlist-edit v-show="!songListShow"/>
 </template>
 
 <script setup>
 import PlaylistSong from '@/components/playList/PlaylistSong.vue'
 import PlaylistComment from '@/components/playList/PlaylistComment.vue'
 import PlaylistCollector from '@/components/playList/PlaylistCollector.vue'
+import PlaylistEdit from '@/components/PlaylistEdit.vue'
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useSongListStore } from '@/stores/songList'
 import { useSongMenuListStore } from '@/stores/songMenuList'
@@ -71,6 +75,7 @@ import { useCommentStore } from '@/stores/commentStores'
 import { useCollectorStore } from '@/stores/CollectorStore'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
+import { Edit } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 const router = useRouter()
 const userStore = useUserStore()
@@ -86,6 +91,8 @@ const songListId = ref(String(route.params.id))
 const playlistUserData = ref()
 const isCollected = ref(false)
 
+
+const songListShow = ref(true)
 // 监听路由参数变化
 watch(
   () => route.params.id,
@@ -239,6 +246,9 @@ const handleDelete = async () => {
         console.error('删除歌单失败:', error)
     }
 }
+const handlePlaylistEdit = () => {
+    songListShow.value = false
+}
 </script>
 
 <style lang="scss" scoped>
@@ -248,7 +258,7 @@ const handleDelete = async () => {
     flex-direction: column;
     position: relative;
     padding: 40px 100px;
-    background-color: var(--background-color-white);
+    background: linear-gradient(to bottom, rgba(224, 201, 201, 0.5) 1%, rgba(247, 249, 252, 0.5) 30%);
     gap: 30px;
     .header {
         width: 100%;
@@ -282,6 +292,9 @@ const handleDelete = async () => {
                 .title {
                     font-weight: var(--font-weight-border);
                     font-size: var(--font-size-xl);
+                    gap: 5px;
+                    display: flex;
+                    align-items: center;
                 }
 
                 .subBox {

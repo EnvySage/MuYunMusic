@@ -37,6 +37,8 @@
 import { ref,computed } from 'vue';
 import { ElMessage } from 'element-plus';
 import { useComponentStatusStore } from '@/stores/componentStatus';
+import { useSongListStore } from '@/stores/songList';
+const songListStore = useSongListStore();
 const componentStatusStore = useComponentStatusStore();
 // 模态框显示状态
 const dialogVisible = computed({
@@ -64,12 +66,15 @@ const handleClose = () => {
 };
 
 // 创建歌单
-const handleCreate = () => {
+const handleCreate = async() => {
   if (!playlistName.value.trim()) {
     ElMessage.warning('请输入歌单标题');
     return;
   }
-  
+  await songListStore.createPlaylist({
+    name: playlistName.value,
+    isPublic: isPrivate.value ? 0 : 1,
+  });
   // 这里可以添加实际的创建歌单逻辑
   ElMessage.success(`已创建歌单：${playlistName.value}`);
   

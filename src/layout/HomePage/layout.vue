@@ -183,83 +183,90 @@ import albumCover from '../../image/Music/晚餐歌.jpg'
 
 }
 
-
 .main-container {
   min-height: 0; // 关键修复：防止 Flex 容器溢出
-  overflow-y: hidden;
 
   // 左侧面板（侧边栏）滚动条样式
   :deep(.sider-panel) {
-    overflow-y: hidden;
-    
     & > div {
       overflow-y: auto;
-      scrollbar-width: none; /* Firefox */
-      -ms-overflow-style: none; /* IE/Edge */
+      
+      // 针对不同浏览器的滚动条隐藏
+      scrollbar-width: none !important; /* Firefox */
+      scrollbar-color: transparent transparent !important; /* Firefox */
+      -ms-overflow-style: none !important; /* IE/Edge */
       
       &::-webkit-scrollbar {
-        width: 0;
-        background: transparent;
-      }
-      
-      &:hover::-webkit-scrollbar {
         width: 8px;
-      }
-      
-      &:hover::-webkit-scrollbar-track {
         background: transparent;
       }
       
-      &:hover::-webkit-scrollbar-thumb {
-        background-color: rgba(0, 0, 0, 0.2);
-        border-radius: 4px;
-        transition: background-color 0.3s;
+      &::-webkit-scrollbar-track {
+        background: transparent;
       }
       
-      &:hover::-webkit-scrollbar-thumb:hover {
-        background-color: rgba(0, 0, 0, 0.4);
+      &::-webkit-scrollbar-thumb {
+        background-color: transparent;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+      }
+      
+      &:hover {
+        scrollbar-color: rgba(0, 0, 0, 0.2) transparent; /* Firefox */
+        
+        &::-webkit-scrollbar-thumb {
+          background-color: rgba(0, 0, 0, 0.2);
+        }
+        
+        &::-webkit-scrollbar-thumb:hover {
+          background-color: rgba(0, 0, 0, 0.4);
+        }
       }
     }
   }
   
   // 右侧面板（内容区）滚动条样式
   :deep(.content-panel) {
-    overflow-y: hidden;
-    
     & > div {
       overflow-y: auto;
-      scrollbar-width: none; /* Firefox */
+      
+      // 针对不同浏览器的滚动条隐藏
+      scrollbar-width: thin; /* Firefox */
+      scrollbar-color: transparent transparent; /* Firefox */
       -ms-overflow-style: none; /* IE/Edge */
       
       &::-webkit-scrollbar {
-        width: 0;
-        background: transparent;
-      }
-      
-      &:hover::-webkit-scrollbar {
         width: 8px;
-      }
-      
-      &:hover::-webkit-scrollbar-track {
         background: transparent;
       }
       
-      &:hover::-webkit-scrollbar-thumb {
-        background-color: rgba(0, 0, 0, 0.2);
-        border-radius: 4px;
-        transition: background-color 0.3s;
+      &::-webkit-scrollbar-track {
+        background: transparent;
       }
       
-      &:hover::-webkit-scrollbar-thumb:hover {
-        background-color: rgba(0, 0, 0, 0.4);
+      &::-webkit-scrollbar-thumb {
+        background-color: transparent;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+      }
+      
+      &:hover {
+        scrollbar-color: rgba(0, 0, 0, 0.2) transparent; /* Firefox */
+        
+        &::-webkit-scrollbar-thumb {
+          background-color: rgba(0, 0, 0, 0.2);
+        }
+        
+        &::-webkit-scrollbar-thumb:hover {
+          background-color: rgba(0, 0, 0, 0.4);
+        }
       }
     }
   }
 }
-
-.content-panel {
-  overflow: hidden;
-}
+// .content-panel {
+//   overflow: hidden;
+// }
 
 .footer {
   position: fixed;

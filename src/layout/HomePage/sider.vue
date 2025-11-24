@@ -1,15 +1,9 @@
 <template>
   <div class="container">
     <div class="common">
-      <song-item 
-        v-for="(item, index) in commonList" 
-        :key="`common_${index}`" 
-        ItemType="iconfont" 
-        :iconfont="item.iconfont"
-        :text="item.text" 
-        :selected="selectedKey === `common_${index}`" 
-        @click="handleItemClick(`common_${index}`,item.id)" 
-      />
+      <song-item v-for="(item, index) in commonList" :key="`common_${index}`" ItemType="iconfont"
+        :iconfont="item.iconfont" :text="item.text" :selected="selectedKey === `common_${index}`"
+        @click="handleItemClick(`common_${index}`, item.id)" />
     </div>
     <div class="own">
       <div class="own-header">
@@ -17,72 +11,63 @@
         <div class="iconfont"></div>
       </div>
       <div class="func">
-        <song-item 
-          v-for="(item, index) in ownList" 
-          :key="`own_${index}`" 
-          ItemType="iconfont" 
-          :iconfont="item.iconfont"
-          :text="item.text" 
-          :selected="selectedKey === `own_${index}`" 
-          @click="handleItemClick(`own_${index}`,item.id)" 
-        />
+        <song-item v-for="(item, index) in ownList" :key="`own_${index}`" ItemType="iconfont" :iconfont="item.iconfont"
+          :text="item.text" :selected="selectedKey === `own_${index}`"
+          @click="handleItemClick(`own_${index}`, item.id)" />
         <div class="more" @click="handleMore">
-          <div class="iconfont icon-zhankai"
-          :style="{transform: isExpand ? 'rotate(180deg)' : 'none'}"></div>
+          <div class="iconfont icon-zhankai" :style="{ transform: isExpand ? 'rotate(180deg)' : 'none' }"></div>
           <span>{{ isExpand ? '收起' : '更多' }}</span>
         </div>
       </div>
     </div>
     <div class="song-menu">
-      <div class="menu-header" @click="toggleMenu">
-        <span class="title">创建的歌单</span>
-        <span class="menuNumber">{{ songMenuList.length }}</span>
-        <div class="iconfont icon-zhankai" :style="{transform : MenuStatue ? 'rotate(180deg)' : 'none'}"></div>
+      <div class="menu-header">
+        <div class="titleBox">
+          <span class="title">创建的歌单</span>
+          <span class="menuNumber">{{ songMenuList.length }}</span>
+          <div class="iconfont icon-zhankai" :style="{ transform: MenuStatue ? 'rotate(180deg)' : 'none' }" @click="toggleMenu"></div>
+        </div>
+        <el-icon @click="handleCreatePlaylist()">
+          <Plus />
+        </el-icon>
       </div>
-      <div class="song-menu-list" v-if="MenuStatue"> 
-        <song-item 
-          v-for="(item, index) in songMenuList" 
-          :key="`song_${index}`" 
-          ItemType="img" 
-          :icon="item.coverUrl" 
-          :text="item.name" 
-          :selected="selectedKey === `song_${index}`" 
-          @click="handleItemClick(`song_${index}`,item.id)" 
-        />
+      <div class="song-menu-list" v-if="MenuStatue">
+        <song-item v-for="(item, index) in songMenuList" :key="`song_${index}`" ItemType="img"
+          :icon="item?.coverUrl || avatar" :text="item.name" :selected="selectedKey === `song_${index}`"
+          @click="handleItemClick(`song_${index}`, item.id)" />
       </div>
     </div>
-        <div class="song-menu">
+    <div class="song-menu">
       <div class="menu-header" @click="toggleCollectedMenu">
-        <span class="title">收藏的歌单</span>
-        <span class="menuNumber">{{ collectedSongMenuList.length }}</span>
-        <div class="iconfont icon-zhankai" :style="{transform : collectedMenuStatus ? 'rotate(180deg)' : 'none'}"></div>
+        <div class="titleBox">
+          <span class="title">收藏的歌单</span>
+          <span class="menuNumber">{{ collectedSongMenuList.length }}</span>
+          <div class="iconfont icon-zhankai" :style="{ transform: collectedMenuStatus ? 'rotate(180deg)' : 'none' }"></div>
+        </div>
       </div>
-      <div class="song-menu-list" v-if="collectedMenuStatus"> 
-        <song-item 
-          v-for="(item, index) in collectedSongMenuList" 
-          :key="`collected_${index}`" 
-          ItemType="img" 
-          :icon="item.coverUrl" 
-          :text="item.name" 
-          :selected="selectedKey === `collected_${index}`" 
-          @click="handleItemClick(`collected_${index}`,item.id)" 
-        />
+      <div class="song-menu-list" v-if="collectedMenuStatus">
+        <song-item v-for="(item, index) in collectedSongMenuList" :key="`collected_${index}`" ItemType="img"
+          :icon="item.coverUrl" :text="item.name" :selected="selectedKey === `collected_${index}`"
+          @click="handleItemClick(`collected_${index}`, item.id)" />
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted,watch } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import songItem from '@/components/songItem.vue';
-import { useRouter,useRoute } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { useSongMenuListStore } from '@/stores/songMenuList';
 import { useUserStore } from '@/stores/user';
+import avatar from '@/image/avatar.png';
+import { useComponentStatusStore } from '@/stores/componentStatus';
+import { Plus } from '@element-plus/icons-vue';
 const userStore = useUserStore();
 const songMenuListStore = useSongMenuListStore();
 const router = useRouter();
 const route = useRoute();
-
+const componentStatusStore = useComponentStatusStore();
 const iconfontList = [{
   iconfont: 'icon-home_fill_light',
   text: '推荐',
@@ -107,7 +92,7 @@ const iconfontList = [{
 }, {
   iconfont: 'icon-guangbo',
   text: '我的博客',
-},{
+}, {
   iconfont: 'icon-yunpan',
   text: '我的云盘',
 }];
@@ -163,7 +148,7 @@ const handleMore = () => {
   }
 };
 
-const handleItemClick = (key,id) => {
+const handleItemClick = (key, id) => {
   selectedKey.value = key;
   if (id !== undefined && id !== null) {
     console.log('跳转到歌单ID:', id);
@@ -174,12 +159,12 @@ const handleItemClick = (key,id) => {
         id: id,
       },
     });
-  }else{
+  } else {
     router.push({
       name: 'recommend',
     })
   }
-};  
+};
 const MenuStatue = ref(true);
 const toggleMenu = () => {
   MenuStatue.value = !MenuStatue.value;
@@ -188,6 +173,9 @@ const collectedMenuStatus = ref(true);
 const toggleCollectedMenu = () => {
   collectedMenuStatus.value = !collectedMenuStatus.value;
 };
+const handleCreatePlaylist = () => {
+  componentStatusStore.showCreatePlaylistComponent();
+};
 </script>
 
 <style lang="scss" scoped>
@@ -195,10 +183,11 @@ const toggleCollectedMenu = () => {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: var(--background-color-sider);
+   background: linear-gradient(to bottom, rgba(224, 201, 201, 0.5) 1%, rgba(247, 249, 252, 0.5) 50%);
   padding: var(--spacing-md);
   overflow-y: auto;
   overflow-x: hidden;
+
   .common {
     display: flex;
     flex-direction: column;
@@ -293,18 +282,21 @@ const toggleCollectedMenu = () => {
       }
     }
 
-    .title {
+    .titleBox {
       flex: 1;
-    }
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
 
-    .menuNumber {
-      font-size: var(--font-size-xs);
-      opacity: 0.7;
-    }
+      .menuNumber {
+        font-size: var(--font-size-xs);
+        opacity: 0.7;
+      }
 
-    .iconfont {
-      font-size: var(--icon-size-sm);
-      transition: var(--transition-all);
+      .iconfont {
+        font-size: var(--icon-size-xs);
+        transition: var(--transition-all);
+      }
     }
   }
 
