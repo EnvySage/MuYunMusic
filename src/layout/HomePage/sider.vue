@@ -13,7 +13,7 @@
       <div class="func">
         <song-item v-for="(item, index) in ownList" :key="`own_${index}`" ItemType="iconfont" :iconfont="item.iconfont"
           :text="item.text" :selected="selectedKey === `own_${index}`"
-          @click="handleItemClick(`own_${index}`, item.id)" />
+          @click="handleOwnClick(`own_${index}`, item.routerName)" />
         <div class="more" @click="handleMore">
           <div class="iconfont icon-zhankai" :style="{ transform: isExpand ? 'rotate(180deg)' : 'none' }"></div>
           <span>{{ isExpand ? '收起' : '更多' }}</span>
@@ -86,6 +86,7 @@ const iconfontList = [{
 }, {
   iconfont: 'icon-xiai',
   text: '我的喜欢的音乐',
+  routerName: 'favorite',
 }, {
   iconfont: 'icon-a-smlsicon_zuijinwenjian',
   text: '最近播放',
@@ -165,6 +166,20 @@ const handleItemClick = (key, id) => {
     })
   }
 };
+const handleOwnClick = (key, routerName) => {
+  selectedKey.value = key;
+  if (routerName !== undefined && routerName !== null) {
+    console.log('跳转:', routerName);
+    router.push({
+      name: routerName,
+    });
+  } else {
+    router.push({
+      name: 'recommend',
+    })
+  }
+};
+
 const MenuStatue = ref(true);
 const toggleMenu = () => {
   MenuStatue.value = !MenuStatue.value;

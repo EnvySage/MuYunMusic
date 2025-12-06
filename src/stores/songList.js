@@ -9,13 +9,13 @@ export const useSongListStore = defineStore("songList", {
     currentSongList: null, // 当前歌单详情
     loading: false,        // 加载状态
   }),
-  
+
   getters: {
     getSongList: (state) => state.songList,
     getCurrentSongList: (state) => state.currentSongList,
     isLoading: (state) => state.loading,
   },
-  
+
   actions: {
     async getAllSongList(id) {
       this.loading = true;
@@ -34,12 +34,12 @@ export const useSongListStore = defineStore("songList", {
     setSongList(songList) {
       this.songList = songList;
     },
-    
+
     clearSongList() {
       this.songList = [];
       this.currentSongList = null;
     },
-    
+
     async deleteCurrentSongList(playlistId) {
       try {
         const response = await request.delete(`/playlist/deletePlaylist/${playlistId}`);
@@ -52,7 +52,7 @@ export const useSongListStore = defineStore("songList", {
         throw error;
       }
     },
-    
+
     async createPlaylist(playlist) {
       try {
         const response = await request.post("/playlist/create", playlist);
@@ -66,5 +66,27 @@ export const useSongListStore = defineStore("songList", {
         throw error;
       }
     },
+    async uploadCoverImage(fileData) {
+      try {
+        const response = await request.post('/oss/upload/image', fileData)
+        return response.data;
+      } catch (error) {
+        console.error("上传封面失败:", error);
+        throw error;
+      }
+    },
+
+    async updatePlaylist(playlist) {
+      try {
+        const response = await request.put('/playlist/editPlaylist', playlist)
+        if (response.success) {
+          ElMessage.success("更新歌单成功");
+          this.currentSongList = response.data;
+        }
+      } catch (error) {
+        console.error("更新歌单失败:", error);
+        throw error;
+      }
+    }
   },
 });

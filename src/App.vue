@@ -39,7 +39,8 @@ const verifytoken = async()=>{
       username: res.data.username,
       nickname: res.data.nickname,
       avatarUrl: res.data.avatarUrl,
-      token: res.data.token
+      token: res.data.token,
+      favoritePlaylistId: res.data.favoritePlaylistId
     })
   } catch (error) {
     console.log('token验证失败', error)

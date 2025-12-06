@@ -6,6 +6,7 @@ export const useSongMenuListStore = defineStore("songMenuList", {
   state: () => ({
     songMenuList: [],
     collectMenuList: [],
+    favoritePlaylist : {},
 
     loading: false,
     collectLoading: false,
@@ -33,10 +34,15 @@ export const useSongMenuListStore = defineStore("songMenuList", {
         if (!userStore.user || !userStore.user.id) {
           throw new Error('用户未登录');
         }
-        
         const userId = userStore.user.id;
         const response = await request.get("/playlist/getAll", { userId: userId });
-        this.songMenuList = response.data || [];
+        this.songMenuList = (response.data || []).filter(playlist => {
+          if (playlist.id === userStore.user.favoritePlaylistId) {
+            this.favoritePlaylist = playlist
+            return false
+          }
+          return true;
+        });
         console.log(userId + "获取歌单列表成功songMenuList", this.songMenuList);
         return this.songMenuList;
       } catch (error) {
@@ -74,7 +80,10 @@ export const useSongMenuListStore = defineStore("songMenuList", {
         this.collectLoading = false;
       }
     },
-    
+    async refreshAllSongMenuList() {
+      await this.getAllSongMenuList(true);
+      await this.getAllCollectMenuList(true);
+    },
     // 清空歌单列表
     clearSongMenuList() {
       this.songMenuList = [];

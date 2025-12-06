@@ -20,6 +20,10 @@ const router = createRouter({
           path: 'userProfile/:id',
           name: 'userProfile',
           component: () => import('@/layout/HomePage/view/userProfile.vue'),
+        },{
+          path: 'favorite',
+          name: 'favorite',
+          component: () => import('@/layout/HomePage/view/songList.vue'),
         }],
     }
   ],

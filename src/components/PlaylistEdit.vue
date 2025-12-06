@@ -86,7 +86,7 @@
         </el-button>
         <el-button 
           class="cancel-btn"
-          @click="handleCancel"
+          @click="handlePlaylistEdit"
         >
           取消
         </el-button>
@@ -96,20 +96,35 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive,watch } from 'vue'
 import { ElMessage, ElForm } from 'element-plus'
 import { useSongListStore } from '@/stores/songList'
+import { useSongMenuListStore } from '@/stores/songMenuList'
+const songMenuListStore = useSongMenuListStore()
 const songListStore = useSongListStore()
 
 // 歌单数据
 const playlist = reactive({
+  id: songListStore.currentSongList?.id || null,
   name: songListStore.currentSongList?.name || '',
   description: songListStore.currentSongList?.description || '',
   coverUrl: songListStore.currentSongList?.coverUrl || '',
   isPrivate: songListStore.currentSongList?.isPrivate || false
 })
 
-
+watch(
+  () => songListStore.currentSongList,
+  (newSongList) => {
+    if (newSongList) {
+      playlist.id = newSongList.id || null
+      playlist.name = newSongList.name || ''
+      playlist.description = newSongList.description || ''
+      playlist.coverUrl = newSongList.coverUrl || ''
+      playlist.isPrivate = newSongList.isPrivate || false
+    }
+  },
+  { immediate: true }
+)
 // 处理封面图片上传
 const handleCoverChange = (file) => {
   if (file.raw) {
@@ -122,14 +137,31 @@ const handleCoverChange = (file) => {
 }
 
 // 保存处理
-const handleSave = () => {
-  // 这里可以添加保存逻辑
+const handleSave = async() => {
+  try{
+    let cover = playlist.coverUrl
+    const coverData = ref({
+      "fileSource": cover,
+      "dirName": "upload/playlist_cover",
+      "fileNamePrefix" : "coverImage"
+    })
+    if(cover.startsWith('data:')){
+      cover = await songListStore.uploadCoverImage(coverData.value)
+      playlist.coverUrl = cover
+      await songListStore.updatePlaylist(playlist)
+      await songMenuListStore.refreshAllSongMenuList()
+    }
+  }catch(error){
+    console.error('上传封面失败:', error);
+    throw error;
+  }
   ElMessage.success('歌单信息已保存')
 }
-
+const emit = defineEmits(['cancel-edit'])
 // 取消处理
-const handleCancel = () => {
-  // 这里可以添加取消逻辑
+const handlePlaylistEdit = () => {
+  playlist.value={}
+  emit('cancel-edit')
 }
 </script>
 

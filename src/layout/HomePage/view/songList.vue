@@ -7,7 +7,7 @@
             <div class="headerInfo">
                 <div class="titleBox">
                     <div class="title">{{ currentSongList?.name || "歌单名字" }}
-                        <el-icon @click="handlePlaylistEdit()"><Edit /></el-icon>
+                        <el-icon @click="handlePlaylistEdit()" v-show="showEdit"><Edit /></el-icon>
                     </div>
                     <div class="subBox">
                         <div class="subImg">
@@ -55,7 +55,7 @@
         </div>
     </div>
     <div v-else class="loading">加载中...</div>
-    <playlist-edit v-show="!songListShow"/>
+    <playlist-edit v-show="!songListShow" @cancel-edit="handlePlaylistEdit"/>
 </template>
 
 <script setup>
@@ -93,6 +93,10 @@ const isCollected = ref(false)
 
 
 const songListShow = ref(true)
+const showEdit = computed(() => {
+    return songListStore.getCurrentSongList?.userId === userStore.user.id
+})
+
 // 监听路由参数变化
 watch(
   () => route.params.id,
@@ -104,7 +108,16 @@ watch(
     }
   }
 )
-
+watch(
+  () => route.name,
+  async (newName, oldName) => {
+    console.log('路由名称变化:', oldName, '->', newName)
+    if (newName === 'favorite') {
+      songListId.value = 'favorite'
+      await loadData()
+    }
+  }
+)
 const loadData = async () => {
   try {
     console.log('开始加载数据，ID:', songListId.value);
@@ -247,7 +260,7 @@ const handleDelete = async () => {
     }
 }
 const handlePlaylistEdit = () => {
-    songListShow.value = false
+    songListShow.value = !songListShow.value
 }
 </script>
 

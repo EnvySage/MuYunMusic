@@ -7,6 +7,7 @@ export const useUserStore = defineStore("user", {
         username: "未登录",
         nickname: "昵称",
         avatarUrl: avatar,
+        favoritePlaylistId: "",
         token: "",
     },
     isLogin: false,
