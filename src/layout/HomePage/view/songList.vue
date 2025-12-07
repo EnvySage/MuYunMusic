@@ -21,7 +21,7 @@
                 <div class="functionBox">
                     <div class="playButton" @click="handlePlayAll()">播放全部</div>
                     <div v-if="!songListStore.loading && currentSongList && currentSongList.userId != userStore.user.id" class="collectButton" @click="handleCollect()">{{ isCollected?"取消收藏":"收藏" }}</div>
-                    <div v-else class="deleteButton" @click="handleDelete()">删除歌单</div>
+                    <div v-else-if="!isFavor" class="deleteButton" @click="handleDelete()" >删除歌单</div>
                 </div>
             </div>
         </div>
@@ -87,34 +87,31 @@ const songListStore = useSongListStore()
 const songMenuListStore = useSongMenuListStore()
 const musicPlayerStore = useMusicPlayerStore()
 
-const songListId = ref(String(route.params.id))
+const songListId = ref(String(route?.params.id || songMenuListStore.favoritePlaylist.id))
 const playlistUserData = ref()
 const isCollected = ref(false)
 
+const isFavor=ref(false);
 
 const songListShow = ref(true)
 const showEdit = computed(() => {
-    return songListStore.getCurrentSongList?.userId === userStore.user.id
+    return songListStore.getCurrentSongList?.userId === userStore.user.id && isFavor.value==false;
 })
-
 // 监听路由参数变化
 watch(
-  () => route.params.id,
-  async (newId, oldId) => {
-    console.log('路由ID变化:', oldId, '->', newId)
-    if (newId && newId !== oldId) {
+  () => [route.params.id, route.name],
+  async ([newId, newName], [oldId, oldName]) => {
+    console.warn('路由变化:', `${oldName}/${oldId}`, '->', `${newName}/${newId}`)
+    // 当路由是 songList 且 ID 改变时，加载普通歌单数据
+    if (newName === 'songList' && newId && newId !== oldId) {
       songListId.value = String(newId)
       await loadData()
     }
-  }
-)
-watch(
-  () => route.name,
-  async (newName, oldName) => {
-    console.log('路由名称变化:', oldName, '->', newName)
-    if (newName === 'favorite') {
-      songListId.value = 'favorite'
-      await loadData()
+    // 当路由切换到 favorite 时，加载收藏数据
+    else if (newName === 'favorite' && newName !== oldName) {
+        songListId.value = String(songMenuListStore.favoritePlaylist.id)
+        isFavor.value= !isFavor.value;
+      await loadFavoriteData()
     }
   }
 )
@@ -148,10 +145,32 @@ const loadData = async () => {
   }
 }
 
+const loadFavoriteData = async () => {
+     try{
+        console.warn("加载喜欢的歌单：", songMenuListStore.favoritePlaylist.id)
+        songListStore.loading = true;
+        await songListStore.getFavoriteSongList();
+        const currentSongList = songMenuListStore.favoritePlaylist
+        songListStore.setCurrentSongList(currentSongList)
+        songListId.value = String(currentSongList.id);
+        playlistUserData.value = userStore.user;
+     }catch(error){
+        console.error("加载喜欢失败",error)
+    }finally{
+        songListStore.loading = false;
+    }
+}
 // 初始化加载
 onMounted(async () => {
-    // 确保必要的数据已加载
-    await loadData()
+    if (route.name === 'favorite') {
+          songListId.value = String(songMenuListStore.favoritePlaylist.id)
+          isFavor.value= !isFavor.value;
+      await loadFavoriteData()
+    } else if (route.name === 'songList' && route.params.id) {
+        
+      songListId.value = String(route.params.id)
+      await loadData()
+    }
 })
 
 const formatDuration = (seconds) => {

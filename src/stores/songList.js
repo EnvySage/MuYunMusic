@@ -17,7 +17,12 @@ export const useSongListStore = defineStore("songList", {
   },
 
   actions: {
+    clearSongList() {
+      this.songList = [];
+      this.currentSongList = null;
+    },
     async getAllSongList(id) {
+      this.clearSongList();
       this.loading = true;
       try {
         const songs = await request.get(`/playlist/getById/${id}`);
@@ -31,13 +36,24 @@ export const useSongListStore = defineStore("songList", {
         this.loading = false;
       }
     },
+    async getFavoriteSongList() {
+      this.clearSongList();
+      this.loading = true;
+      try{
+        const favoritePlaylist = await request.get(`/playlist/getFavoriteByUserId`);
+        this.songList = favoritePlaylist.data;
+      }catch(error){
+        console.error("获取喜欢的歌单失败:", error);
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
     setSongList(songList) {
       this.songList = songList;
     },
-
-    clearSongList() {
-      this.songList = [];
-      this.currentSongList = null;
+    setCurrentSongList(playlist) {
+      this.currentSongList = playlist;
     },
 
     async deleteCurrentSongList(playlistId) {

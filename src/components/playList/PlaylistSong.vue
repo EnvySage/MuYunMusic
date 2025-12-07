@@ -104,6 +104,7 @@ const isCurrentSong = (row) => {
 const handleLike = async (row) => {
   await collectorStore.addLikeSong(row.id)
   songListStore.getAllSongList(props.playlistId)
+  songListStore.getFavoriteSongList()
   // 同步更新当前播放歌曲的收藏状态
   if (musicPlayerStore.currentSong.id === row.id) {
     musicPlayerStore.setCurrentSongLike(!row.like)
