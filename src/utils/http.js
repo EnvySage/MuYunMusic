@@ -97,7 +97,7 @@ const request = {
    */
   get(url, params = {}, config = {}) {
     console.log('GET请求:', url, params)
-    return http.get(url, { params:params, ...config })
+    return http.get(url, {...config, params: params })
   },
   
   /**

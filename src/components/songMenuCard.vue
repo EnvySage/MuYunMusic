@@ -12,7 +12,7 @@
       </div>
       
       <!-- 歌曲列表 -->
-      <div class="song-list">
+      <div class="song-list" v-if="tracks.length > 0">
         <div v-for="(track, index) in tracks" :key="index" class="track-item">
           <span class="track-number">{{ index + 1 }}.</span>
           <span class="track-name">{{ track.name }}</span>
@@ -49,11 +49,7 @@ const props = defineProps({
   },
   tracks: {
     type: Array,
-    default: () => [
-      { name: 'おしんこ' },
-      { name: '雪の降らない星' },
-      { name: 'すずめ feat.十明' }
-    ]
+    default: ""
   }
 });
 const isHovered = ref(false);

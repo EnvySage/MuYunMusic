@@ -24,6 +24,10 @@ const router = createRouter({
           path: 'favorite',
           name: 'favorite',
           component: () => import('@/layout/HomePage/view/songList.vue'),
+        },{
+          path: 'search',
+          name: 'search',
+          component: () => import('@/layout/HomePage/view/search.vue'),
         }],
     }
   ],

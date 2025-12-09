@@ -7,7 +7,10 @@
                     <div class="search-back iconfont icon-down" @click="backPreview" style="transform: rotate(90deg);"></div>
                     <div class="search-input">
                         <div class="iconfont icon-sousuosearch"></div>
-                        <input type="text" placeholder="搜索音乐、歌单、专辑" />
+                        <input type="text" placeholder="搜索音乐、歌单、专辑"
+                        v-model="searchValue"
+                        @keyup.enter="handleSearch"
+                        />
                     </div>
                     <div class="search-speak">
                         <div class="iconfont icon-maikefeng"></div>
@@ -36,15 +39,16 @@
 import { useUserStore } from '@/stores/user';
 import { useComponentStatusStore } from '@/stores/componentStatus';
 import { useThemeStore } from '@/stores/theme';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted,ref } from 'vue';
 import { useRouter } from 'vue-router';
-
+import { useSearchResultStore } from '@/stores/searchResultStore';
+const searchStore = useSearchResultStore();
 const userStore = useUserStore();
 const componentStatusStore = useComponentStatusStore();
 const themeStore = useThemeStore();
 const user = computed(() => userStore.user);
 const router = useRouter();
-
+const searchValue = ref('');
 onMounted(() => {
   themeStore.initTheme();
 });
@@ -69,6 +73,12 @@ const toggleTheme = () => {
 
  const UserPage = () => {
     router.push('/userProfile/' + userStore.user.id);
+ }
+ const handleSearch = async() => { 
+    if(searchValue.value.trim() !== ''){
+        await searchStore.getSearchResult(searchValue.value.trim(),"all");
+        router.push({ path: '/search', query: { keyword: searchValue.value.trim() } });
+    }
  }
 </script>
 
