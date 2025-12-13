@@ -1,16 +1,21 @@
 <template>
-    <div class="song-card">
+    <div class="song-card" @click="handlePlaySong(props.song)">
         <div class="cover-container">
-            <img :src="coverUrl" alt="歌曲封面" class="cover">
+            <img :src="song.coverUrl" alt="歌曲封面" class="cover">
+            <div class="play-overlay">
+                <div class="play-icon">
+                    <div class="iconfont icon-bofang1"></div>
+                </div>
+            </div>
         </div>
         
         <div class="info-container">
             <div class="song-title">
-                {{ songTitle }}
+                {{ song.name }}
             </div>
             
             <div class="artist-info">
-                <span class="artist-name">{{ artistName }}</span>
+                <span class="artist-name">{{ song.artistName }}</span>
                 <span v-if="isVip" class="vip-badge">VIP</span>
                 <span v-if="hasMv" class="mv-badge">MV</span>
                 <span v-if="isOriginal" class="original-badge">原唱</span>
@@ -21,18 +26,9 @@
 
 <script setup>
 import { defineProps } from 'vue'
-
 const props = defineProps({
-    coverUrl: {
-        type: String,
-        required: true
-    },
-    songTitle: {
-        type: String,
-        required: true
-    },
-    artistName: {
-        type: String,
+    song:{
+        type: Object,
         required: true
     },
     isVip: {
@@ -48,8 +44,13 @@ const props = defineProps({
         default: false
     }
 })
-</script>
 
+const emits = defineEmits(['row-click'])
+const handlePlaySong = (row) => {
+  emits('row-click', row)
+}
+
+</script>
 <style lang="scss" scoped>
 .song-card {
     display: flex;
